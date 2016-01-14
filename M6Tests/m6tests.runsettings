@@ -19,6 +19,7 @@
               <Exclude>
                 <Source>.*M6\.cs</Source>
                 <Source>.*M6Form.*</Source>
+                <Source>.*FileSystemHelper.*</Source>
                 <Source>.*Resources.*</Source>
               </Exclude>
             </Sources>
