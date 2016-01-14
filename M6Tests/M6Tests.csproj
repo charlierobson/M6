@@ -84,7 +84,7 @@
     <None Include="m6tests.runsettings">
       <SubType>Designer</SubType>
     </None>
-    <None Include="NuGet\packages.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\M6\M6.csproj">
