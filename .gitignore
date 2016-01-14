@@ -112,6 +112,7 @@ UpgradeLog*.XML
 
 #
 *.exe
+!nuget.exe
 *.dll
 *.suo
 *.user
