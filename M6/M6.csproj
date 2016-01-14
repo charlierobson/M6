@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Classes\BuilderFactory.cs" />
+    <Compile Include="Classes\FileConverterFactory.cs" />
     <Compile Include="Classes\Clip.cs" />
     <Compile Include="Classes\ClipFactory.cs" />
     <Compile Include="Form\FileSystemHelper.cs" />
@@ -47,13 +47,13 @@
       <DependentUpon>M6Form.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\FrameData.cs" />
-    <Compile Include="Classes\FrameDataBuilder.cs" />
-    <Compile Include="Classes\IBuilderFactory.cs" />
+    <Compile Include="Classes\RawPCMFileConverter.cs" />
+    <Compile Include="Classes\IFileConverterFactory.cs" />
     <Compile Include="Classes\IClip.cs" />
     <Compile Include="Classes\IClipFactory.cs" />
     <Compile Include="Classes\IFileSystemHelper.cs" />
     <Compile Include="Classes\IFrameData.cs" />
-    <Compile Include="Classes\IFrameDataBuilder.cs" />
+    <Compile Include="Classes\IFileConverter.cs" />
     <Compile Include="Form\M6.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\M6Form.resx">

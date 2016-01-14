@@ -2,18 +2,18 @@ using System;
 
 namespace M6.Classes
 {
-    public class FrameDataBuilder : IFrameDataBuilder
+    public class RawPCMFileConverter : IFileConverter
     {
         private readonly string _path;
         private readonly IFileSystemHelper _fileSystemHelper;
 
-        public FrameDataBuilder(string path, IFileSystemHelper fileSystemHelper)
+        public RawPCMFileConverter(string path, IFileSystemHelper fileSystemHelper)
         {
             _path = path;
             _fileSystemHelper = fileSystemHelper;
         }
 
-        public IFrameData Build()
+        public IFrameData ProcessFile()
         {
             var bytes = _fileSystemHelper.ReadAllBytes(_path);
             var frames = bytes.Length/4;

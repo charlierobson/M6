@@ -2,20 +2,20 @@ namespace M6.Classes
 {
     public class ClipFactory : IClipFactory
     {
-        private readonly IBuilderFactory _builderFactory;
+        private readonly IFileConverterFactory _fileConverterFactory;
 
-        public ClipFactory(IBuilderFactory builderFactory)
+        public ClipFactory(IFileConverterFactory fileConverterFactory)
         {
-            _builderFactory = builderFactory;
+            _fileConverterFactory = fileConverterFactory;
         }
 
         public IClip GetClip(string path)
         {
-            var builder = _builderFactory.GetBuilderFor(path);
+            var builder = _fileConverterFactory.GetBuilderFor(path);
 
             if (builder == null) return null;
 
-            var frames = builder.Build();
+            var frames = builder.ProcessFile();
 
             return frames == null ? null : new Clip(frames);
         }

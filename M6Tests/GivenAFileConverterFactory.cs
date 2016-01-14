@@ -3,20 +3,20 @@ using Xunit;
 
 namespace M6Tests
 {
-    public class GivenABuilderFactory
+    public class GivenAFileConverterFactory
     {
         [Theory]
         [InlineData(".raw")]
         public void ABuilderWillBeReturnedIfAKnownExtensionIsRecognised(string extension)
         {
-            var factory = new BuilderFactory();
+            var factory = new FileConverterFactory();
             Assert.NotNull(factory.GetBuilderFor("abc" + extension));
         }
 
         [Fact]
         public void BuilderExtensionComaprisonsAreCaseInsensitive()
         {
-            var factory = new BuilderFactory();
+            var factory = new FileConverterFactory();
             Assert.NotNull(factory.GetBuilderFor("abc.rAw"));
         }
 
@@ -26,7 +26,7 @@ namespace M6Tests
         [InlineData(".flac")]
         public void NoBuilderWillBeReturnedIfTheExtensionDoesNotMatchAKnownType(string extension)
         {
-            var factory = new BuilderFactory();
+            var factory = new FileConverterFactory();
             Assert.Null(factory.GetBuilderFor("abc" + extension));
         }
     }

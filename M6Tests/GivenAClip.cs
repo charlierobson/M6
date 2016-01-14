@@ -7,17 +7,6 @@ namespace M6Tests
     public class GivenAClip
     {
         [Fact]
-        public void ClipFactoryReturnsNullWhenClipCannotBeCreatedBecauseFactoryWasntAbleToCreateBuilder()
-        {
-            var mockBuilderFactory = new Mock<IBuilderFactory>();
-            mockBuilderFactory.Setup(b => b.GetBuilderFor(It.IsAny<string>())).Returns((IFrameDataBuilder)null);
-
-            var clip = new ClipFactory(mockBuilderFactory.Object).GetClip("clip1.type");
-
-            Assert.Null(clip);
-        }
-
-        [Fact]
         public void ALoadedClipExposesItslengthInSampleFrames()
         {
             var mockFileSystemHelper = new Mock<IFileSystemHelper>();
@@ -26,10 +15,10 @@ namespace M6Tests
             var mockFrames = new Mock<IFrameData>();
             mockFrames.Setup(f => f.Length).Returns(123);
 
-            var mockWavBuilder = new Mock<IFrameDataBuilder>();
-            mockWavBuilder.Setup(w => w.Build()).Returns(mockFrames.Object);
+            var mockWavBuilder = new Mock<IFileConverter>();
+            mockWavBuilder.Setup(w => w.ProcessFile()).Returns(mockFrames.Object);
 
-            var mockBuilderFactory = new Mock<IBuilderFactory>();
+            var mockBuilderFactory = new Mock<IFileConverterFactory>();
             mockBuilderFactory.Setup(b => b.GetBuilderFor(It.IsAny<string>())).Returns(mockWavBuilder.Object);
 
             var clip = new ClipFactory(mockBuilderFactory.Object).GetClip("clip1.type");
@@ -50,10 +39,10 @@ namespace M6Tests
             mockFrames.Setup(f => f.Length).Returns(123);
             mockFrames.Setup(f => f.GetSubset(It.IsAny<int>(), It.IsAny<int>())).Returns(mockSubFrames.Object);
 
-            var mockWavBuilder = new Mock<IFrameDataBuilder>();
-            mockWavBuilder.Setup(w => w.Build()).Returns(mockFrames.Object);
+            var mockWavBuilder = new Mock<IFileConverter>();
+            mockWavBuilder.Setup(w => w.ProcessFile()).Returns(mockFrames.Object);
 
-            var mockBuilderFactory = new Mock<IBuilderFactory>();
+            var mockBuilderFactory = new Mock<IFileConverterFactory>();
             mockBuilderFactory.Setup(b => b.GetBuilderFor(It.IsAny<string>())).Returns(mockWavBuilder.Object);
 
             var clip = new ClipFactory(mockBuilderFactory.Object).GetClip("clip1.type");

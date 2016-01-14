@@ -20,9 +20,9 @@ namespace M6
         {
             var error = ToRaw(@"C:\Users\Administrator\99s.mp3", @"c:\temp.raw");
 
-            var builderFactory = new BuilderFactory();
+            var builderFactory = new FileConverterFactory();
             var builder = builderFactory.GetBuilderFor(@"c:\temp.raw");
-            var waveData = builder.Build();
+            var waveData = builder.ProcessFile();
             var summary = new WaveSummary();
             var summaryData = summary.MakeSummaryData(waveData, 1024);
 

@@ -74,7 +74,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GivenABuilderFactory.cs" />
+    <Compile Include="GivenAFileConverterFactory.cs" />
+    <Compile Include="GivenAClipFactory.cs" />
+    <Compile Include="GivenARawPCMFileConverter.cs" />
     <Compile Include="GivenAWaveSummary.cs" />
     <Compile Include="GivenAFrameData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
