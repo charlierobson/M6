@@ -1,4 +1,5 @@
 ﻿using M6.Classes;
+using Moq;
 using Xunit;
 
 namespace M6Tests
@@ -7,27 +8,54 @@ namespace M6Tests
     {
         [Theory]
         [InlineData(".raw")]
-        public void ABuilderWillBeReturnedIfAKnownExtensionIsRecognised(string extension)
+        [InlineData(".mp3")]
+        public void ABuilderWillBeReturnedIfAKnownExtensionIsRecognisedAndTheFileExists(string extension)
         {
-            var factory = new FileConverterFactory();
-            Assert.NotNull(factory.GetBuilderFor("abc" + extension));
-        }
+            var mockFileSystemhelper = new Mock<IFileSystemHelper>();
+            mockFileSystemhelper.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
 
-        [Fact]
-        public void BuilderExtensionComaprisonsAreCaseInsensitive()
-        {
-            var factory = new FileConverterFactory();
-            Assert.NotNull(factory.GetBuilderFor("abc.rAw"));
+            var factory = new FileConverterFactory(mockFileSystemhelper.Object);
+
+            Assert.NotNull(factory.ParseFile("abc" + extension));
         }
 
         [Theory]
-        [InlineData(".mp3")]
+        [InlineData(".mP3")]
+        [InlineData(".Mp3")]
+        [InlineData(".MP3")]
+        [InlineData(".raw")]
+        [InlineData(".rAw")]
+        [InlineData(".RAW")]
+        public void BuilderExtensionComaprisonsAreCaseInsensitive(string path)
+        {
+            var mockFileSystemhelper = new Mock<IFileSystemHelper>();
+            mockFileSystemhelper.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
+
+            var factory = new FileConverterFactory(mockFileSystemhelper.Object);
+
+            Assert.NotNull(factory.ParseFile(path));
+        }
+
+        [Theory]
         [InlineData(".wav")]
         [InlineData(".flac")]
-        public void NoBuilderWillBeReturnedIfTheExtensionDoesNotMatchAKnownType(string extension)
+        public void NoBuilderWillBeReturnedIfTheFileExistsButExtensionDoesNotMatchAKnownType(string extension)
         {
-            var factory = new FileConverterFactory();
-            Assert.Null(factory.GetBuilderFor("abc" + extension));
+            var mockFileSystemhelper = new Mock<IFileSystemHelper>();
+            mockFileSystemhelper.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
+
+            var factory = new FileConverterFactory(mockFileSystemhelper.Object);
+            Assert.Null(factory.ParseFile("abc" + extension));
+        }
+
+        [Fact]
+        public void NoBuilderWillBeReturnedIfTheFileDoesntExists()
+        {
+            var mockFileSystemhelper = new Mock<IFileSystemHelper>();
+            mockFileSystemhelper.Setup(f => f.FileExists(It.IsAny<string>())).Returns(false);
+
+            var factory = new FileConverterFactory(mockFileSystemhelper.Object);
+            Assert.Null(factory.ParseFile("irrelevant"));
         }
     }
 }
