@@ -38,6 +38,8 @@
             this.Name = "M6Form";
             this.Text = "M6";
             this.Load += new System.EventHandler(this.M6Form_Load);
+            this.ResizeEnd += new System.EventHandler(this.M6Form_ResizeEnd);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.M6Form_Paint);
             this.ResumeLayout(false);
 
         }
