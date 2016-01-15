@@ -1,10 +1,14 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace M6
 {
     public partial class M6Form : Form
     {
+        private bool _down;
+        private Point _position;
+        private Point _delta;
         //private Bitmap _bitmap;
 
         public M6Form()
@@ -54,12 +58,41 @@ namespace M6
                 e.Graphics.DrawLine(Pens.Black, i * spacing, 0, i * spacing, 20);
             }
 
-            e.Graphics.DrawString("W: " + clientWidth, DefaultFont, new SolidBrush(Color.Black), 10, 100);
+            var txt = string.Format("W: {0}", clientWidth);
+            e.Graphics.DrawString(txt, DefaultFont, new SolidBrush(Color.Black), 10, 100);
+
+            txt = string.Format("P: {0},{1}", _position.X, _position.Y);
+            e.Graphics.DrawString(txt, DefaultFont, new SolidBrush(Color.Black), 10, 120);
+
+            txt = string.Format("D: {0},{1}", _delta.X, _delta.Y);
+            e.Graphics.DrawString(txt, DefaultFont, new SolidBrush(Color.Black), 10, 140);
         }
 
         private void M6Form_ResizeEnd(object sender, System.EventArgs e)
         {
             Invalidate();
+        }
+
+        private void M6Form_MouseDown(object sender, MouseEventArgs e)
+        {
+            _down = true;
+            _position = e.Location;
+            _delta = new Point(0,0);
+            Invalidate();
+        }
+
+        private void M6Form_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_down) return;
+
+            _delta.X = e.Location.X - _position.X;
+            _delta.Y = e.Location.Y - _position.Y;
+            Invalidate();
+        }
+
+        private void M6Form_MouseUp(object sender, MouseEventArgs e)
+        {
+            _down = false;
         }
     }
 }

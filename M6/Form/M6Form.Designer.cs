@@ -40,6 +40,9 @@
             this.Load += new System.EventHandler(this.M6Form_Load);
             this.ResizeEnd += new System.EventHandler(this.M6Form_ResizeEnd);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.M6Form_Paint);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.M6Form_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.M6Form_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.M6Form_MouseUp);
             this.ResumeLayout(false);
 
         }
