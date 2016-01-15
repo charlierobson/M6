@@ -29,20 +29,17 @@ namespace M6Tests
         [Fact]
         public void TheSummaryDataWillCondenseTheSampleSetDownToASetOfLocalMaxima()
         {
-            var l = new float[1024];
-            l[0x012] = 0.8f;
-            l[0x013] = -0.7f;
+            var exampleData = new float[1024];
+            exampleData[0x012] = 0.8f;
+            exampleData[0x013] = -0.7f;
+            exampleData[0x134] = 0.75f;
+            exampleData[0x135] = -0.5f;
+            exampleData[0x256] = 0.29f;
+            exampleData[0x257] = -0.3f;
+            exampleData[0x378] = 0.99f;
+            exampleData[0x379] = -0.98f;
 
-            l[0x134] = 0.75f;
-            l[0x135] = -0.5f;
-
-            l[0x256] = 0.29f;
-            l[0x257] = -0.3f;
-
-            l[0x378] = 0.99f;
-            l[0x379] = -0.98f;
-
-            var frameData = new FrameData(l, l);
+            var frameData = new FrameData(exampleData, exampleData);
             var summary = _waveSummary.MakeSummaryData(frameData, 0x100);
 
             var resultSet = new[]{ 0.8f, 0.75f, 0.3f, 0.99f };
