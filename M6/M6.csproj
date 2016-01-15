@@ -36,7 +36,7 @@
   <ItemGroup>
     <Compile Include="Classes\FileConverterFactory.cs" />
     <Compile Include="Classes\Clip.cs" />
-    <Compile Include="Classes\ClipFactory.cs" />
+    <Compile Include="Classes\MP3FileConverter.cs" />
     <Compile Include="Form\FileSystemHelper.cs" />
     <Compile Include="Classes\IWaveSummary.cs" />
     <Compile Include="Classes\WaveSummary.cs" />

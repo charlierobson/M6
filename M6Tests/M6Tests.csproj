@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GivenAFileConverterFactory.cs" />
-    <Compile Include="GivenAClipFactory.cs" />
     <Compile Include="GivenARawPCMFileConverter.cs" />
     <Compile Include="GivenAWaveSummary.cs" />
     <Compile Include="GivenAFrameData.cs" />
