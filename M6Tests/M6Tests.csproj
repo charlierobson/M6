@@ -74,7 +74,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GivenADesktop.cs" />
     <Compile Include="GivenAFileConverterFactory.cs" />
+    <Compile Include="GivenARange.cs" />
     <Compile Include="GivenARawPCMFileConverter.cs" />
     <Compile Include="GivenAWaveSummary.cs" />
     <Compile Include="GivenAFrameData.cs" />

@@ -1,83 +1,149 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
+using M6.Classes;
 
 namespace M6
 {
     public partial class M6Form : Form
     {
         private bool _down;
-        private Point _position;
-        private Point _delta;
-        //private Bitmap _bitmap;
+        private Bitmap _bitmap;
+
+        private int _logy;
+
+        private Bitmap _bbBitmap;
+
+        private Delta _delta;
+
+        private readonly List<Tune> _tunes;
+
+        private int _ticksPerPixel;
+        private Range _desktopRange;
+        private Tune _selectedTune;
 
         public M6Form()
         {
+            _tunes = new List<Tune>();
+
             InitializeComponent();
         }
 
         private void M6Form_Load(object sender, System.EventArgs e)
         {
-/*
+            _delta = new Delta();
+
             var converter = new FileConverterFactory(new FileSystemHelper()).ParseFile(@"C:\Users\Administrator\99s.mp3");
             if (converter == null) return;
 
             var waveData = converter.ProcessFile();
             if (waveData == null) return;
 
+            _ticksPerPixel = 1024;
+
             var summary = new WaveSummary();
-            var summaryData = summary.MakeSummaryData(waveData, 1024);
+            var summaryData = summary.MakeSummaryData(waveData, _ticksPerPixel);
 
             _bitmap = new Bitmap(summaryData.Length, 250, PixelFormat.Format24bppRgb);
             var graphics = Graphics.FromImage(_bitmap);
             graphics.Clear(Color.CadetBlue);
+            graphics.DrawRectangle(Pens.Black, 0,0, _bitmap.Width-1,_bitmap.Height-1);
 
             var x = 0;
             foreach (var m in summaryData.Left)
             {
-                var h = 240*m;
-                var d = (_bitmap.Height - h) / 2;
+                var h = 240 * m;
+                var d = (_bitmap.Height - h)/2;
                 graphics.DrawLine(Pens.Black, x, d, x, _bitmap.Height - d);
                 ++x;
             }
 
-            _bitmap.Save(@"C:\Users\Administrator\99s.png");
- */
+            _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
+
+            _tunes.Add(new Tune(waveData.Length));
+            _tunes[0].StartTick = 40000;
+            _tunes[0].Track = 0;
+
+            _tunes.Add(new Tune(waveData.Length));
+            _tunes[1].StartTick = 1000000;
+            _tunes[1].Track = 1;
+
+            _desktopRange = new Range(0, ClientRectangle.Width * _ticksPerPixel);
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            // stop the flicker
         }
 
         private void M6Form_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.Clear(Color.Goldenrod);
+            var backbuffer = Graphics.FromImage(_bbBitmap);
 
-            var clientWidth = ClientRectangle.Width;
-            var spacing = 500 / 10;
-            var numTicks = clientWidth / spacing;
+            backbuffer.Clear(Color.GhostWhite);
 
-            for (var i = 0; i < numTicks; ++i)
+            backbuffer.DrawLine(Pens.Black, 0,0,0,20);
+            backbuffer.DrawLine(Pens.Black, ClientRectangle.Width - 1, 0, ClientRectangle.Width - 1, 20);
+
+            backbuffer.DrawString(_desktopRange.Minimum.ToString(), DefaultFont, new SolidBrush(Color.Black), 5, 10);
+
+            var rangeMax = _desktopRange.Maximum.ToString();
+            var extent = TextRenderer.MeasureText(backbuffer, rangeMax, DefaultFont);
+            backbuffer.DrawString(rangeMax, DefaultFont, new SolidBrush(Color.Black), ClientRectangle.Width - 1 - extent.Width - 5, 10);
+
+            foreach (var tune in _tunes)
             {
-                e.Graphics.DrawLine(Pens.Black, i * spacing, 0, i * spacing, 20);
+                var tuneRange = tune.Range;
+                if (!_desktopRange.ContainsOrIntersectsWithRange(tuneRange)) continue;
+
+                var x = (tuneRange.Minimum - _desktopRange.Minimum) / _ticksPerPixel;
+                backbuffer.DrawImage(_bitmap, x, 100 + tune.Track*260);
             }
 
-            var txt = string.Format("W: {0}", clientWidth);
-            e.Graphics.DrawString(txt, DefaultFont, new SolidBrush(Color.Black), 10, 100);
+            Logout();
 
-            txt = string.Format("P: {0},{1}", _position.X, _position.Y);
-            e.Graphics.DrawString(txt, DefaultFont, new SolidBrush(Color.Black), 10, 120);
-
-            txt = string.Format("D: {0},{1}", _delta.X, _delta.Y);
-            e.Graphics.DrawString(txt, DefaultFont, new SolidBrush(Color.Black), 10, 140);
+            e.Graphics.DrawImage(_bbBitmap, 0, 0);
         }
 
-        private void M6Form_ResizeEnd(object sender, System.EventArgs e)
+        private void Logout(Graphics g = null, string format = null, params object[] parameters)
         {
+            if (g == null || format == null)
+            {
+                _logy = 30;
+                return;
+            }
+
+            var text = string.Format(format, parameters);
+            g.DrawString(text, DefaultFont, new SolidBrush(Color.Black), 10, _logy);
+            _logy += 15;
+        }
+
+        private void M6Form_ResizeEnd(object sender, EventArgs e)
+        {
+            _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
+            _desktopRange.Maximum = _desktopRange.Minimum + ClientRectangle.Width * _ticksPerPixel;
             Invalidate();
         }
 
         private void M6Form_MouseDown(object sender, MouseEventArgs e)
         {
             _down = true;
-            _position = e.Location;
-            _delta = new Point(0,0);
+            _delta.Reset(e.Location);
+
+            var tick = _desktopRange.Minimum + e.Location.X * _ticksPerPixel;
+
+            _selectedTune = _tunes.FirstOrDefault(tune => tune.Range.ContainsValue(tick) && new Range(100 + tune.Track*260, 100 + (tune.Track+1)*260).ContainsValue(e.Location.Y));
+
+            Invalidate();
+        }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            base.OnMouseWheel(e);
+
             Invalidate();
         }
 
@@ -85,8 +151,24 @@ namespace M6
         {
             if (!_down) return;
 
-            _delta.X = e.Location.X - _position.X;
-            _delta.Y = e.Location.Y - _position.Y;
+            _delta.Update(e.Location);
+            var dist = _delta.DX * _ticksPerPixel;
+
+            if (_selectedTune != null)
+            {
+                _selectedTune.StartTick += dist;
+            }
+            else
+            {
+                if (_desktopRange.Minimum < dist)
+                {
+                    dist = _desktopRange.Minimum;
+                }
+
+                _desktopRange.Minimum -= dist;
+                _desktopRange.Maximum -= dist;
+            }
+
             Invalidate();
         }
 

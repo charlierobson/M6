@@ -37,9 +37,14 @@
     <Compile Include="Classes\FileConverterFactory.cs" />
     <Compile Include="Classes\Clip.cs" />
     <Compile Include="Classes\MP3FileConverter.cs" />
+    <Compile Include="Classes\Delta.cs" />
+    <Compile Include="Classes\Range.cs" />
+    <Compile Include="Classes\Tune.cs" />
     <Compile Include="Form\FileSystemHelper.cs" />
     <Compile Include="Classes\IWaveSummary.cs" />
     <Compile Include="Classes\WaveSummary.cs" />
+    <Compile Include="Classes\IDelta.cs" />
+    <Compile Include="Classes\IMovable.cs" />
     <Compile Include="Form\M6Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -55,6 +60,7 @@
     <Compile Include="Classes\IFrameData.cs" />
     <Compile Include="Classes\IFileConverter.cs" />
     <Compile Include="Form\M6.cs" />
+    <Compile Include="Classes\Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\M6Form.resx">
       <DependentUpon>M6Form.cs</DependentUpon>
