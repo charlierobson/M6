@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using M6.Classes;
+using Newtonsoft.Json;
 
 namespace M6
 {
@@ -34,29 +35,31 @@ namespace M6
 
         private void M6Form_Load(object sender, System.EventArgs e)
         {
+            //string[] tunes = { "paris red - good friend.mp3", "jinny - keep warm.mp3" };
+            //File.WriteAllText(".\\tunes.json", JsonConvert.SerializeObject(tunes));
+
+            var files = JsonConvert.DeserializeObject<string[]>(File.ReadAllText(".\\tunes.json"));
+            foreach (var file in files)
+            {
+                var converter = new FileConverterFactory(new FileSystemHelper()).ParseFile(file);
+                if (converter == null) continue;
+
+                var waveData = converter.ProcessFile();
+                if (waveData == null) continue;
+
+                var tune = new Tune(waveData);
+                tune.BuildSummaries();
+                tune.StartTick = 0;
+                tune.Track = _tunes.Count;
+
+                _tunes.Add(tune);
+            }
+
             _delta = new Delta();
-
-            var converter = new FileConverterFactory(new FileSystemHelper()).ParseFile(@"C:\Users\Administrator\99s.mp3");
-            if (converter == null) return;
-
-            var waveData = converter.ProcessFile();
-            if (waveData == null) return;
 
             _ticksPerPixel = 1024;
 
-            var tune = new Tune(waveData);
-            tune.BuildSummaries();
-            _tunes.Add(tune);
-            _tunes[0].StartTick = 40000;
-            _tunes[0].Track = 0;
-
-            tune = new Tune(waveData);
-            tune.BuildSummaries();
-            _tunes.Add(tune);
-            _tunes[1].StartTick = 1000000;
-            _tunes[1].Track = 1;
-
-            var summaryData = tune.Summary(_ticksPerPixel);
+            var summaryData = _tunes[0].Summary(_ticksPerPixel);
             _summaryBitmap = new SummaryBitmap(summaryData);
 
             _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);

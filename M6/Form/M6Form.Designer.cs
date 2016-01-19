@@ -33,6 +33,7 @@
             // 
             // buttonFit
             // 
+            this.buttonFit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonFit.Location = new System.Drawing.Point(969, 462);
             this.buttonFit.Name = "buttonFit";
             this.buttonFit.Size = new System.Drawing.Size(75, 23);
