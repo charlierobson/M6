@@ -179,19 +179,16 @@ namespace M6
             var fraction = (double)e.Location.X / ClientRectangle.Width;
             var tickAtCursor = _desktopRange.Minimum + (e.Location.X * _ticksPerPixel);
 
-            if (_ticksPerPixel + e.Delta > 128)
-            {
-                _ticksPerPixel += e.Delta;
+            if (_ticksPerPixel + e.Delta <= 128) return;
 
-                var newTickWidth = ClientRectangle.Width*_ticksPerPixel;
+            _ticksPerPixel += e.Delta;
 
-                _desktopRange.Minimum = (int) (tickAtCursor - (newTickWidth*fraction));
-                _desktopRange.Maximum = _desktopRange.Minimum + newTickWidth;
+            var newTickWidth = ClientRectangle.Width*_ticksPerPixel;
 
-                var w = _desktopRange.Width;
+            _desktopRange.Minimum = (int) (tickAtCursor - (newTickWidth*fraction));
+            _desktopRange.Maximum = _desktopRange.Minimum + newTickWidth;
 
-                Invalidate();
-            }
+            Invalidate();
         }
 
         private void M6Form_MouseMove(object sender, MouseEventArgs e)
