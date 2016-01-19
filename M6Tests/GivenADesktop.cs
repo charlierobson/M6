@@ -60,10 +60,10 @@ namespace M6Tests
             var tune = new Tune(700) { StartTick = 200 };
 
             var firstVisibleTuneTick = Math.Max(0, sampleWindow.Minimum - tuneStartTick);
-            Assert.Equal(100000, firstVisibleTuneTick);
+            Assert.Equal(300, firstVisibleTuneTick);
 
-            //var lastVisibleTuneTick = Math.Min(sampleWindow.Maximum, tune.EndTick);
-            //Assert.Equal(firstVisibleTuneTick + sampleWindow.Width, lastVisibleTuneTick);
+            var lastVisibleTuneTick = firstVisibleTuneTick + sampleWindow.Width;
+            Assert.Equal(500);
         }
     }
 }
