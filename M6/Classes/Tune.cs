@@ -29,16 +29,16 @@
         {
             var summary = new WaveSummaryBuilder();
 
-            _summaries[2] = summary.MakeSummaryData(_frameData, 16384);
+            _summaries[2] = summary.MakeSummaryData(_frameData, 4096);
             _summaries[1] = summary.MakeSummaryData(_frameData, 1024);
-            _summaries[0] = summary.MakeSummaryData(_frameData, 128);
+            _summaries[0] = summary.MakeSummaryData(_frameData, 256);
         }
 
         public IFrameData Summary(int displayScale)
         {
-            if (displayScale > 2000) return _summaries[0];
-            else if (displayScale >500) return _summaries[1];
-            else return _summaries[2];
+            if (displayScale > 4000) return _summaries[2];
+            else if (displayScale > 1000) return _summaries[1];
+            else return _summaries[0];
         }
 
         public Range Range

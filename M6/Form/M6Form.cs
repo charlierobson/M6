@@ -46,19 +46,20 @@ namespace M6
 
             var tune = new Tune(waveData);
             tune.BuildSummaries();
+            _tunes.Add(tune);
+            _tunes[0].StartTick = 40000;
+            _tunes[0].Track = 0;
+
+            tune = new Tune(waveData);
+            tune.BuildSummaries();
+            _tunes.Add(tune);
+            _tunes[1].StartTick = 1000000;
+            _tunes[1].Track = 1;
 
             var summaryData = tune.Summary(_ticksPerPixel);
             _summaryBitmap = new SummaryBitmap(summaryData);
 
             _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
-
-            _tunes.Add(tune);
-            _tunes[0].StartTick = 40000;
-            _tunes[0].Track = 0;
-
-            _tunes.Add(tune);
-            _tunes[1].StartTick = 1000000;
-            _tunes[1].Track = 1;
 
             _desktopRange = new Range(0, ClientRectangle.Width * _ticksPerPixel);
         }
@@ -90,6 +91,8 @@ namespace M6
                 var tuneRange = tune.Range;
                 if (!_desktopRange.ContainsOrIntersectsWithRange(tuneRange)) continue;
 
+                Logout(backbuffer, "{0}", tune.Track);
+
                 var firstVisibleTuneTick = Math.Max(_desktopRange.Minimum, tune.StartTick);
                 var firstVisibleTunePixel = (firstVisibleTuneTick - _desktopRange.Minimum) /_ticksPerPixel;
 
@@ -99,7 +102,6 @@ namespace M6
                 var summaryData = tune.Summary(_ticksPerPixel);
                 if (summaryData.Resolution != _summaryBitmap.Resolution)
                 {
-                    Console.WriteLine("Generate new bitmap");
                     _summaryBitmap = new SummaryBitmap(summaryData);
                 }
 
@@ -197,6 +199,14 @@ namespace M6
         private void M6Form_MouseUp(object sender, MouseEventArgs e)
         {
             _down = false;
+        }
+
+        private void buttonFit_Click(object sender, EventArgs e)
+        {
+            _desktopRange.Maximum = _tunes.Select(tune => tune.EndTick).Concat(new[] { 0 }).Max();
+            _desktopRange.Minimum = _tunes.Select(tune => tune.StartTick).Concat(new[] {Int32.MaxValue}).Min();
+            _ticksPerPixel = _desktopRange.Width/ClientRectangle.Width;
+            Invalidate();
         }
     }
 }
