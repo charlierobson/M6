@@ -2,6 +2,7 @@
 {
     public class Tune : ITune
     {
+        private readonly IFrameData _frameData;
         public int StartTick { get; set; }
 
         public int EndTick
@@ -18,9 +19,20 @@
             Ticks = ticks;
         }
 
+        public Tune(IFrameData d)
+        {
+            Ticks = d.Length;
+            _frameData = d;
+        }
+
         public Range Range
         {
             get { return new Range(StartTick, EndTick); }
+        }
+
+        public float Data(int i)
+        {
+            return _frameData.Left[i];
         }
     }
 
