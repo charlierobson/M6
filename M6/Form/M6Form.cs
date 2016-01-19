@@ -11,7 +11,6 @@ namespace M6
     public partial class M6Form : Form
     {
         private bool _down;
-        private Bitmap _bitmap;
 
         private int _logy;
 
@@ -24,7 +23,7 @@ namespace M6
         private int _ticksPerPixel;
         private Range _desktopRange;
         private Tune _selectedTune;
-        private int _summaryTicksPerPixel;
+        private SummaryBitmap _summaryBitmap;
 
         public M6Form()
         {
@@ -44,32 +43,20 @@ namespace M6
             if (waveData == null) return;
 
             _ticksPerPixel = 1024;
-            _summaryTicksPerPixel = 256;
 
-            var summary = new WaveSummary();
-            var summaryData = summary.MakeSummaryData(waveData, _summaryTicksPerPixel);
+            var tune = new Tune(waveData);
+            tune.BuildSummaries();
 
-            _bitmap = new Bitmap(summaryData.Length, 250, PixelFormat.Format24bppRgb);
-            var graphics = Graphics.FromImage(_bitmap);
-            graphics.Clear(Color.CadetBlue);
-            graphics.DrawRectangle(Pens.Black, 0,0, _bitmap.Width-1,_bitmap.Height-1);
-
-            var x = 0;
-            foreach (var m in summaryData.Left)
-            {
-                var h = 240 * m;
-                var d = (_bitmap.Height - h)/2;
-                graphics.DrawLine(Pens.Black, x, d, x, _bitmap.Height - d);
-                ++x;
-            }
+            var summaryData = tune.Summary(_ticksPerPixel);
+            _summaryBitmap = new SummaryBitmap(summaryData);
 
             _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
 
-            _tunes.Add(new Tune(waveData));
+            _tunes.Add(tune);
             _tunes[0].StartTick = 40000;
             _tunes[0].Track = 0;
 
-            _tunes.Add(new Tune(waveData));
+            _tunes.Add(tune);
             _tunes[1].StartTick = 1000000;
             _tunes[1].Track = 1;
 
@@ -109,31 +96,17 @@ namespace M6
                 var tickOffsetIntoTune = Math.Max(0, _desktopRange.Minimum - tune.StartTick);
                 var visibleTicks = Math.Min(_desktopRange.Width, Math.Min(_desktopRange.Maximum - tune.StartTick, tune.EndTick - _desktopRange.Minimum));
 
-                var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * 260, visibleTicks / _ticksPerPixel, 250);
-                var srcRect = new Rectangle(tickOffsetIntoTune / _summaryTicksPerPixel, 0, visibleTicks / _summaryTicksPerPixel, 250);
-
-                //if(true)
-                //{
-                //    var b = new Bitmap(dstRect.Width, dstRect.Height);
-                //    var graphics = Graphics.FromImage(b);
-                //    graphics.Clear(Color.CadetBlue);
-                //    graphics.DrawRectangle(Pens.Black, 0, 0, _bitmap.Width - 1, _bitmap.Height - 1);
-
-                //    for (int m = 0; m < visibleTicks / _ticksPerPixel; ++m)
-                //    {
-                //        var h = 240 * tune.Data(firstVisibleTunePixel + m);
-                //        var d = (_bitmap.Height - h) / 2;
-                //        graphics.DrawLine(Pens.Black, m, d, m, _bitmap.Height - d);
-                //    }
-
-                //    backbuffer.DrawImage(b, dstRect);
-                //}
-                //else
+                var summaryData = tune.Summary(_ticksPerPixel);
+                if (summaryData.Resolution != _summaryBitmap.Resolution)
                 {
-                    backbuffer.DrawImage(_bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
+                    Console.WriteLine("Generate new bitmap");
+                    _summaryBitmap = new SummaryBitmap(summaryData);
                 }
 
-                backbuffer.DrawRectangle(Pens.Chartreuse, dstRect);
+                var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * 260, visibleTicks / _ticksPerPixel, 250);
+                var srcRect = new Rectangle(tickOffsetIntoTune / _summaryBitmap.Resolution, 0, visibleTicks / _summaryBitmap.Resolution, 250);
+
+                backbuffer.DrawImage(_summaryBitmap.Bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
             }
 
             Logout(backbuffer, "tpp {0}", _ticksPerPixel);
@@ -188,6 +161,11 @@ namespace M6
             _desktopRange.Minimum = (int) (tickAtCursor - (newTickWidth*fraction));
             _desktopRange.Maximum = _desktopRange.Minimum + newTickWidth;
 
+            if (_desktopRange.Minimum < 0)
+            {
+                _desktopRange.Minimum = 0;
+                _desktopRange.Maximum = newTickWidth;
+            }
             Invalidate();
         }
 

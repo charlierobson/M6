@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace M6.Classes
 {
-    public class WaveSummary : IWaveSummary
+    public class WaveSummaryBuilder : IWaveSummary
     {
         public IFrameData MakeSummaryData(IFrameData input, int ratio)
         {
@@ -32,7 +32,7 @@ namespace M6.Classes
                 max.Add(Math.Max(maxmag, Math.Abs(minmag)));
             }
 
-            return new FrameData(max.ToArray(), null);
+            return new FrameData(max.ToArray(), null, ratio);
         }
     }
 }

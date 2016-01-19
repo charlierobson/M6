@@ -39,10 +39,11 @@
     <Compile Include="Classes\MP3FileConverter.cs" />
     <Compile Include="Classes\Delta.cs" />
     <Compile Include="Classes\Range.cs" />
+    <Compile Include="Classes\SummaryBitmap.cs" />
     <Compile Include="Classes\Tune.cs" />
     <Compile Include="Form\FileSystemHelper.cs" />
     <Compile Include="Classes\IWaveSummary.cs" />
-    <Compile Include="Classes\WaveSummary.cs" />
+    <Compile Include="Classes\WaveSummaryBuilder.cs" />
     <Compile Include="Classes\IDelta.cs" />
     <Compile Include="Classes\IMovable.cs" />
     <Compile Include="Form\M6Form.cs">

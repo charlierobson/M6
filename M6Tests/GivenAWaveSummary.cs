@@ -5,11 +5,11 @@ namespace M6Tests
 {
     public class GivenAWaveSummary
     {
-        private readonly WaveSummary _waveSummary;
+        private readonly WaveSummaryBuilder _waveSummaryBuilder;
 
         public GivenAWaveSummary()
         {
-            _waveSummary = new WaveSummary();
+            _waveSummaryBuilder = new WaveSummaryBuilder();
         }
 
         [Theory]
@@ -22,7 +22,7 @@ namespace M6Tests
         public void AnInputSetOfACertainSizeWillCondenseToAKnownSize(int condensationRatio, int inputSetSize, int expectedOutputSetSize)
         {
             var frameData = new FrameData(new float[inputSetSize], new float[inputSetSize]);
-            var summary = _waveSummary.MakeSummaryData(frameData, condensationRatio);
+            var summary = _waveSummaryBuilder.MakeSummaryData(frameData, condensationRatio);
             Assert.Equal(expectedOutputSetSize, summary.Length);
         }
 
@@ -40,7 +40,7 @@ namespace M6Tests
             exampleData[0x379] = -0.98f;
 
             var frameData = new FrameData(exampleData, exampleData);
-            var summary = _waveSummary.MakeSummaryData(frameData, 0x100);
+            var summary = _waveSummaryBuilder.MakeSummaryData(frameData, 0x100);
 
             var resultSet = new[]{ 0.8f, 0.75f, 0.3f, 0.99f };
 
