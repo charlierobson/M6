@@ -11,7 +11,6 @@ namespace M6Tests
         [InlineData(0, 4000)]
         [InlineData(2000, 4000)]
         [InlineData(1500, 2500)]
-        [InlineData(3000, 4000)]
         public void TheseRangesIntersectOrAreContainedByTheViewport(int min, int max)
         {
             var viewport = new Range(1000, 3000);
@@ -21,7 +20,7 @@ namespace M6Tests
 
         [Theory]
         [InlineData(0, 999)]
-        [InlineData(3001, 4000)]
+        [InlineData(3000, 4000)]
         public void TheseRangesDoNotAppearInTheViewport(int min, int max)
         {
             var viewport = new Range(1000, 3000);

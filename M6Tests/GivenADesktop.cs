@@ -6,64 +6,91 @@ namespace M6Tests
 {
     public class GivenADesktop
     {
-        public GivenADesktop()
+        [Fact]
+        public void TuneStartsWithinDesktopViewRange()
         {
+            // |-----|-----|
+            // |     |=====|=====|
+            // 500  600   700   800
+
+            var window = new Range(500, 700);
+            var tune = new Tune(200) { StartTick = 600 };
+
+            var firstVisibleTuneTick = Math.Max(window.Minimum, tune.StartTick);
+            Assert.Equal(600, firstVisibleTuneTick);
+
+            var lastVisibleTuneTick = Math.Min(window.Maximum, tune.EndTick);
+            Assert.Equal(700, lastVisibleTuneTick);
+
+            var offsetIntoTune = Math.Max(0, window.Minimum - tune.StartTick);
+            Assert.Equal(0, offsetIntoTune);
+
+            var visibleTicks = Math.Min(window.Width, Math.Min(window.Maximum - tune.StartTick, tune.EndTick - window.Minimum));
+            Assert.Equal(100, visibleTicks);
         }
 
         [Fact]
-        public void TuneStartsWithinDescktopViewRange()
+        public void TuneStraddlesDesktopViewRange()
         {
-            // |--------ddd-----------|
-            // |     |================|======|
+            //        |-----|-----|
+            //  |=====|===========|=====|
+            // 400   500         700   800
 
-            var pixels = 100;
-            var ticksPerPixel = 500;
+            var window = new Range(500, 700);
+            var tune = new Tune(400) { StartTick = 400 };
 
-            var sampleWindow = new Range(0, pixels * ticksPerPixel);
+            var firstVisibleTuneTick = Math.Max(window.Minimum, tune.StartTick);
+            Assert.Equal(500, firstVisibleTuneTick);
 
-            var tune = new Tune(400000) { StartTick = 25000};
+            var lastVisibleTuneTick = Math.Min(window.Maximum, tune.EndTick);
+            Assert.Equal(700, lastVisibleTuneTick);
 
-            var samplesVisible = sampleWindow.Maximum - tune.StartTick;
-            Assert.Equal(25000, samplesVisible);
+            var offsetIntoTune = Math.Max(0, window.Minimum - tune.StartTick);
+            Assert.Equal(100, offsetIntoTune);
 
-            var startPixel = tune.StartTick/ticksPerPixel;
-            Assert.Equal(50, startPixel);
+            var visibleTicks = Math.Min(window.Width, Math.Min(window.Maximum - tune.StartTick, tune.EndTick - window.Minimum));
+            Assert.Equal(200, visibleTicks);
+        }
 
-            // showing more on screen
-            ticksPerPixel = 1000;
-            sampleWindow.Maximum = pixels * ticksPerPixel;
+        [Fact]
+        public void TuneEndWithinDesktopViewRange()
+        {
+            //         |-----------|
+            //   |=====|=====|     |
+            //  400   500   600   700
+            //
+            var window = new Range(500, 700);
+            var tune = new Tune(200) { StartTick = 400 };
 
-            Assert.Equal(100000, sampleWindow.Maximum);
+            var firstVisibleTuneTick = Math.Max(window.Minimum, tune.StartTick);
+            Assert.Equal(500, firstVisibleTuneTick);
 
-            samplesVisible = sampleWindow.Maximum - tune.StartTick;
-            Assert.Equal(75000, samplesVisible);
+            var lastVisibleTuneTick = Math.Min(window.Maximum, tune.EndTick);
+            Assert.Equal(600, lastVisibleTuneTick);
 
-            startPixel = tune.StartTick / ticksPerPixel;
-            Assert.Equal(25, startPixel);
+            var offsetIntoTune = Math.Max(0, window.Minimum - tune.StartTick);
+            Assert.Equal(100, offsetIntoTune);
 
-            // negative first visible = offset onto desktop
-            var firstVisibleTuneTick = sampleWindow.Minimum - tune.StartTick;
-            Assert.Equal(-25000, firstVisibleTuneTick);
-
-            var startPixelFromFirstVisible = -firstVisibleTuneTick / ticksPerPixel;
-            Assert.Equal(startPixel, startPixelFromFirstVisible);
+            var visibleTicks = Math.Min(window.Width, Math.Min(window.Maximum - tune.StartTick, tune.EndTick - window.Minimum));
+            Assert.Equal(100, visibleTicks);
         }
 
         [Theory]
-        [InlineData(400000)]
-        public void TuneStraddlesDesktopViewRange(int tuneStartTick)
+        [InlineData(400)]
+        [InlineData(800)]
+        public void TuneNotInRange(int startTick)
         {
-            //       |----------------------|
-            // |=====|======================|=====|
+            //               |-----|
+            //   |=====|     |     |     |=====|
+            //  400   500   600   700   800   900
+            //
+            var window = new Range(600, 700);
+            var tune = new Tune(100) { StartTick = startTick };
 
-            var sampleWindow = new Range(500, 700);
-            var tune = new Tune(700) { StartTick = 200 };
-
-            var firstVisibleTuneTick = Math.Max(0, sampleWindow.Minimum - tuneStartTick);
-            Assert.Equal(300, firstVisibleTuneTick);
-
-            var lastVisibleTuneTick = firstVisibleTuneTick + sampleWindow.Width;
-            Assert.Equal(500);
+            var visibleTicks = Math.Min(window.Width, Math.Min(window.Maximum - tune.StartTick, tune.EndTick - window.Minimum));
+            Assert.Equal(-100, visibleTicks);
         }
+
+
     }
 }

@@ -94,17 +94,29 @@ namespace M6
             var extent = TextRenderer.MeasureText(backbuffer, rangeMax, DefaultFont);
             backbuffer.DrawString(rangeMax, DefaultFont, new SolidBrush(Color.Black), ClientRectangle.Width - 1 - extent.Width - 5, 10);
 
+            Logout();
+
             foreach (var tune in _tunes)
             {
                 var tuneRange = tune.Range;
                 if (!_desktopRange.ContainsOrIntersectsWithRange(tuneRange)) continue;
 
-                var x = (tuneRange.Minimum - _desktopRange.Minimum) / _ticksPerPixel;
-                backbuffer.DrawImage(_bitmap, x, 100 + tune.Track*260);
+                var firstVisibleTuneTick = Math.Max(_desktopRange.Minimum, tune.StartTick);
+                var firstVisibleTunePixel = (firstVisibleTuneTick - _desktopRange.Minimum) /_ticksPerPixel;
+
+                var tickOffsetIntoTune = Math.Max(0, _desktopRange.Minimum - tune.StartTick);
+                var visibleTicks = Math.Min(_desktopRange.Width, Math.Min(_desktopRange.Maximum - tune.StartTick, tune.EndTick - _desktopRange.Minimum));
+
+                var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * 260, visibleTicks / _ticksPerPixel, 250);
+
+                const int summaryResolution = 1024;
+                var srcRect = new Rectangle(tickOffsetIntoTune / summaryResolution, 0, visibleTicks / summaryResolution, 250);
+
+                backbuffer.DrawImage(_bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
+                backbuffer.DrawRectangle(Pens.Chartreuse, dstRect);
             }
 
-            Logout();
-
+            Logout(backbuffer, "tpp {0}", _ticksPerPixel);
             e.Graphics.DrawImage(_bbBitmap, 0, 0);
         }
 
@@ -143,6 +155,9 @@ namespace M6
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             base.OnMouseWheel(e);
+
+            _ticksPerPixel += e.Delta;
+            _desktopRange.Maximum = ClientRectangle.Width * _ticksPerPixel;
 
             Invalidate();
         }

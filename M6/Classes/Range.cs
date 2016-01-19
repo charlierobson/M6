@@ -13,7 +13,7 @@
 
         public int Width { get { return Maximum - Minimum; } }
 
-        public bool IsValid() { return Minimum > Maximum; }
+        public bool IsValid() { return Minimum < Maximum; }
 
         public bool ContainsValue(int value)
         {
