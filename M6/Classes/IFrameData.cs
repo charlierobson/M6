@@ -1,4 +1,4 @@
-using System;
+using ProtoBuf;
 
 namespace M6.Classes
 {
@@ -13,12 +13,5 @@ namespace M6.Classes
 
         void BeginChunkyRead(int chunkSize);
         bool ReadChunk(ref IFrameDataSubset subset);
-    }
-
-    public interface IFrameDataSubset
-    {
-        int Length { get; }
-        ArraySegment<float> Left { get; }
-        ArraySegment<float> Right { get; }
     }
 }

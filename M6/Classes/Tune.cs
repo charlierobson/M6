@@ -1,12 +1,28 @@
 ﻿using M6.Processing.OnsetDetection;
+using ProtoBuf;
 
 namespace M6.Classes
 {
+    [ProtoContract]
+    public class SummaryCollection
+    {
+        [ProtoMember(1, OverwriteList = true)]
+        public readonly FrameData[] Summary;
+
+        public SummaryCollection()
+        {
+            Summary = new FrameData[3];
+        }
+    }
+
     public class Tune : ITune
     {
         private readonly IFrameData _frameData;
-        private readonly IFrameData[] _summaries;
+
+        public SummaryCollection SummaryCollection;
+
         private IFrameData _onsets;
+
         public int StartTick { get; set; }
 
         public int EndTick
@@ -25,16 +41,17 @@ namespace M6.Classes
         public Tune(IFrameData frameData)
         {
             _frameData = frameData;
-            _summaries = new IFrameData[3];
         }
 
         public void BuildSummaries()
         {
-            var summaryBuilder = new WaveSummaryBuilder();
+            var builder = new WaveSummaryBuilder();
 
-            _summaries[2] = summaryBuilder.MakeSummaryData(_frameData, 4096);
-            _summaries[1] = summaryBuilder.MakeSummaryData(_frameData, 1024);
-            _summaries[0] = summaryBuilder.MakeSummaryData(_frameData, 256);
+            SummaryCollection = new SummaryCollection();
+
+            SummaryCollection.Summary[2] = (FrameData)builder.MakeSummaryData(_frameData, 4096);
+            SummaryCollection.Summary[1] = (FrameData)builder.MakeSummaryData(_frameData, 1024);
+            SummaryCollection.Summary[0] = (FrameData)builder.MakeSummaryData(_frameData, 256);
         }
 
         public void BuildOnsets()
@@ -46,9 +63,9 @@ namespace M6.Classes
 
         public IFrameData Summary(int displayScale)
         {
-            if (displayScale > 4000) return _summaries[2];
-            else if (displayScale > 1000) return _summaries[1];
-            else return _summaries[0];
+            if (displayScale >= 4096) return SummaryCollection.Summary[2];
+            else if (displayScale >= 1024) return SummaryCollection.Summary[1];
+            else return SummaryCollection.Summary[0];
         }
 
         public IFrameData Onsets(int displayScale)
@@ -61,27 +78,11 @@ namespace M6.Classes
             get { return new Range(StartTick, EndTick); }
         }
 
+        public SummaryBitmap SummaryBitmap { get; set; }
+
         public float Data(int i)
         {
             return _frameData.Left[i];
         }
-    }
-
-    public interface ITune
-    {
-        int StartTick { get; set; }
-        int EndTick { get; }
-        int Ticks { get; }
-        int Track { get; }
-
-        double Rate { get; set; }
-
-        void BuildSummaries();
-        IFrameData Summary(int displayScale);
-
-        void BuildOnsets();
-        IFrameData Onsets(int displayScale);
-
-        Range Range { get; }
     }
 }

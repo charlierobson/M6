@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using M6.Classes;
 using Newtonsoft.Json;
+using ProtoBuf;
 
 namespace M6
 {
@@ -33,18 +34,22 @@ namespace M6
             InitializeComponent();
         }
 
-        private void M6Form_Load(object sender, System.EventArgs e)
+        private void M6Form_Load(object sender, EventArgs e)
         {
-            //string[] tunes = { "C:/Users/Administrator/99s.mp3", "C:/Users/Administrator/99s.mp3" };
-            //File.WriteAllText(".\\tunes.json", JsonConvert.SerializeObject(tunes));
+            //var p = new Project { TuneFilenames = new[] { "abc", "def" } };
+            //string x = JsonConvert.SerializeObject(p);
 
-            var tuneList = File.ReadAllText("c:\\tunes.json");
-            var files = JsonConvert.DeserializeObject<string[]>(tuneList);
-            foreach (var file in files)
+            var project = Project.OpenProject(@"C:\Users\Administrator\repro\");
+
+            foreach (var fileName in project.TuneFilenames)
             {
-                Console.WriteLine("Convert mp3");
+                var metaDataPath = Path.Combine(project.WorkingFolder, "MetaData");
+                Directory.CreateDirectory(metaDataPath);
 
-                var converter = new FileConverterFactory(new FileSystemHelper()).ParseFile(file);
+                var tunePath = Path.Combine(project.WorkingFolder, fileName);
+                var summaryPath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "summary");
+
+                var converter = new FileConverterFactory(new FileSystemHelper()).ParseFile(tunePath);
                 if (converter == null) continue;
 
                 var waveData = converter.ProcessFile();
@@ -52,9 +57,37 @@ namespace M6
 
                 var tune = new Tune(waveData);
 
-                Console.WriteLine("build summaries");
+                SummaryCollection summaryData = null;
+                try
+                {
+                    using (var summaryFile = File.OpenRead(summaryPath))
+                    {
+                        summaryData = Serializer.Deserialize<SummaryCollection>(summaryFile);
+                    }
 
-                tune.BuildSummaries();
+                    tune.SummaryCollection = summaryData;
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+
+                if (summaryData == null)
+                {
+                    tune.BuildSummaries();
+                    try
+                    {
+                        using (var summaryFile = File.Create(summaryPath))
+                        {
+                            Serializer.Serialize(summaryFile, tune.SummaryCollection);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                }
+
                 tune.StartTick = 0;
                 tune.Track = _tunes.Count;
 
@@ -64,8 +97,6 @@ namespace M6
             _delta = new Delta();
 
             _ticksPerPixel = 1024;
-
-            _summaryBitmap = new SummaryBitmap(_tunes[0].Summary(_ticksPerPixel), null);
 
             _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
 
@@ -108,15 +139,15 @@ namespace M6
                 var visibleTicks = Math.Min(_desktopRange.Width, Math.Min(_desktopRange.Maximum - tune.StartTick, tune.EndTick - _desktopRange.Minimum));
 
                 var summaryData = tune.Summary(_ticksPerPixel);
-                if (summaryData.Resolution != _summaryBitmap.Resolution)
+                if (tune.SummaryBitmap == null || summaryData.Resolution != tune.SummaryBitmap.Resolution)
                 {
-                    _summaryBitmap = new SummaryBitmap(summaryData, tune.Onsets(_ticksPerPixel));
+                    tune.SummaryBitmap = new SummaryBitmap(summaryData, tune.Onsets(_ticksPerPixel));
                 }
 
                 var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * 260, visibleTicks / _ticksPerPixel, 250);
-                var srcRect = new Rectangle(tickOffsetIntoTune / _summaryBitmap.Resolution, 0, visibleTicks / _summaryBitmap.Resolution, 250);
+                var srcRect = new Rectangle(tickOffsetIntoTune / tune.SummaryBitmap.Resolution, 0, visibleTicks / tune.SummaryBitmap.Resolution, 250);
 
-                backbuffer.DrawImage(_summaryBitmap.Bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
+                backbuffer.DrawImage(tune.SummaryBitmap.Bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
             }
 
             Logout(backbuffer, "tpp {0}", _ticksPerPixel);

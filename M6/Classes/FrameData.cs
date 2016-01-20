@@ -1,37 +1,45 @@
 using System;
+using ProtoBuf;
 
 namespace M6.Classes
 {
+    [ProtoContract]
     public class FrameData : IFrameData
     {
-        private readonly float[] _leftChannel;
-        private readonly float[] _rightChannel;
+        [ProtoMember(1)]
+        public float[] Left { get; private set; }
+
+        [ProtoMember(2)]
+        public float[] Right { get; private set; }
+
+        [ProtoMember(3)]
+        public int Resolution { get; private set; }
+
+        public int Length { get { return Left.Length; } }
 
         private int _chunkReadIndex;
         private int _chunkReadSize;
+
+        public FrameData()
+        {
+            // required for protobuffer deserialisation
+        }
 
         public FrameData(float[] left, float[] right, int resolution = 1)
         {
             if (right != null && left.Length != right.Length) throw new ArgumentException();
 
-            _leftChannel = left;
-            _rightChannel = right;
+            Left = left;
+            Right = right;
 
             Resolution = resolution;
         }
 
-        public int Length { get { return _leftChannel.Length; } }
-
-        public int Resolution { get; private set; }
-
-        public float[] Left { get { return _leftChannel; } }
-        public float[] Right { get { return _rightChannel; } }
-
         public IFrameDataSubset GetSubset(int start, int count)
         {
-            if (start + count > _leftChannel.Length)
+            if (start + count > Left.Length)
             {
-                count = _leftChannel.Length - start;
+                count = Left.Length - start;
             }
 
             return new FrameDataSubset(Left, Right, start, count);
@@ -45,14 +53,14 @@ namespace M6.Classes
 
         public bool ReadChunk(ref IFrameDataSubset subset)
         {
-            if (_chunkReadIndex >= _leftChannel.Length) return false;
+            if (_chunkReadIndex >= Left.Length) return false;
 
             var readSize = _chunkReadSize;
             var readIndex = _chunkReadIndex;
 
-            if (readIndex + readSize >= _leftChannel.Length)
+            if (readIndex + readSize >= Left.Length)
             {
-                readSize = _leftChannel.Length - readIndex;
+                readSize = Left.Length - readIndex;
             }
 
             _chunkReadIndex += readSize;
@@ -60,22 +68,5 @@ namespace M6.Classes
             subset = new FrameDataSubset(Left, Right, readIndex, readSize);
             return true;
         }
-    }
-
-    public class FrameDataSubset : IFrameDataSubset
-    {
-        public FrameDataSubset(float[] left, float[] right, int start, int count)
-        {
-            Left = new ArraySegment<float>(left, start, count);
-            Right = new ArraySegment<float>(right, start, count);
-        }
-
-        public int Length
-        {
-            get { return Left.Count; }
-        }
-
-        public ArraySegment<float> Left { get; private set; }
-        public ArraySegment<float> Right { get; private set; }
     }
 }

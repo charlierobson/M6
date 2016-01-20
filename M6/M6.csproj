@@ -35,8 +35,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Classes\FileConverterFactory.cs" />
+    <Compile Include="Classes\FrameDataSubset.cs" />
+    <Compile Include="Classes\IFrameDataSubset.cs" />
+    <Compile Include="Classes\ITune.cs" />
     <Compile Include="Classes\MP3FileConverter.cs" />
     <Compile Include="Classes\Delta.cs" />
+    <Compile Include="Classes\Project.cs" />
     <Compile Include="Classes\Range.cs" />
     <Compile Include="Classes\SummaryBitmap.cs" />
     <Compile Include="Classes\Tune.cs" />
@@ -44,7 +48,6 @@
     <Compile Include="Classes\IWaveSummary.cs" />
     <Compile Include="Classes\WaveSummaryBuilder.cs" />
     <Compile Include="Classes\IDelta.cs" />
-    <Compile Include="Classes\IMovable.cs" />
     <Compile Include="Form\M6Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -60,7 +63,6 @@
     <Compile Include="Classes\IFrameData.cs" />
     <Compile Include="Classes\IFileConverter.cs" />
     <Compile Include="Form\M6.cs" />
-    <Compile Include="Classes\Position.cs" />
     <Compile Include="Processing\OnsetDetection\AudioAnalysis.cs" />
     <Compile Include="Processing\OnsetDetection\FFT.cs" />
     <Compile Include="Processing\OnsetDetection\LomontFFT.cs" />
@@ -88,10 +90,14 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
