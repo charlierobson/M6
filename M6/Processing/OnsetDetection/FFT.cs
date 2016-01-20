@@ -5,7 +5,6 @@
 // Applies a hamming window to the data before doing the FFT
 
 using System;
-using AudioProcessing.OnsetDetection;
 
 namespace M6.Processing.OnsetDetection
 {

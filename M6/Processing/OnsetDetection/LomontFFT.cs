@@ -17,7 +17,7 @@ using System;
  *                 - Switched UnitTest to static.                                                                
  * Jan 2010 - v1.0 - Initial release                                                                             
  */
-namespace AudioProcessing.OnsetDetection
+namespace M6.Processing.OnsetDetection
 {
     /// <summary>                                                                                                
     /// Represent a class that performs real or complex valued Fast Fourier                                      
