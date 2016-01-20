@@ -25,7 +25,6 @@ namespace M6
         private int _ticksPerPixel;
         private Range _desktopRange;
         private Tune _selectedTune;
-        private SummaryBitmap _summaryBitmap;
 
         public M6Form()
         {
@@ -39,6 +38,8 @@ namespace M6
             //var p = new Project { TuneFilenames = new[] { "abc", "def" } };
             //string x = JsonConvert.SerializeObject(p);
 
+            var fileConverterFactory = new FileConverterFactory(new FileSystemHelper());
+
             var project = Project.OpenProject(@"C:\Users\Administrator\repro\");
 
             foreach (var fileName in project.TuneFilenames)
@@ -47,13 +48,34 @@ namespace M6
                 Directory.CreateDirectory(metaDataPath);
 
                 var tunePath = Path.Combine(project.WorkingFolder, fileName);
+
+                var rawTunePath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "m6raw");
                 var summaryPath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "summary");
 
-                var converter = new FileConverterFactory(new FileSystemHelper()).ParseFile(tunePath);
+                IFileConverter converter = null;
+                if ((converter = fileConverterFactory.ParseFile(rawTunePath)) == null)
+                {
+                    converter = fileConverterFactory.ParseFile(tunePath);
+                }
                 if (converter == null) continue;
 
                 var waveData = converter.ProcessFile();
                 if (waveData == null) continue;
+
+                if (!File.Exists(rawTunePath))
+                {
+                    try
+                    {
+                        using (var rawFile = File.Create(rawTunePath))
+                        {
+                            Serializer.Serialize(rawFile, waveData);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                }
 
                 var tune = new Tune(waveData);
 

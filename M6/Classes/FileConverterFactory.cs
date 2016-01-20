@@ -15,6 +15,9 @@ namespace M6.Classes
         {
             if (!_fileSystemHelper.FileExists(path)) return null;
 
+            if (path.EndsWith(".m6raw", StringComparison.InvariantCultureIgnoreCase))
+                return new RawFloatPCMFileConverter(path, _fileSystemHelper);
+
             if (path.EndsWith(".raw", StringComparison.InvariantCultureIgnoreCase))
                 return new RawPCMFileConverter(path, _fileSystemHelper);
 

@@ -42,6 +42,7 @@
     <Compile Include="Classes\Delta.cs" />
     <Compile Include="Classes\Project.cs" />
     <Compile Include="Classes\Range.cs" />
+    <Compile Include="Classes\RawPCMFileConverter.cs" />
     <Compile Include="Classes\SummaryBitmap.cs" />
     <Compile Include="Classes\Tune.cs" />
     <Compile Include="Form\FileSystemHelper.cs" />
@@ -55,7 +56,7 @@
       <DependentUpon>M6Form.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\FrameData.cs" />
-    <Compile Include="Classes\RawPCMFileConverter.cs" />
+    <Compile Include="Classes\RawFloatPCMFileConverter.cs" />
     <Compile Include="Classes\IFileConverterFactory.cs" />
     <Compile Include="Classes\IClip.cs" />
     <Compile Include="Classes\IClipFactory.cs" />

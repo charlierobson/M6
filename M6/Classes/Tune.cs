@@ -59,7 +59,7 @@ namespace M6.Classes
             var audioAnalysis = new AudioAnalysis();
             var onsetData = audioAnalysis.DetectOnsets(_frameData, 44100, 1024);
             _onsets = new FrameData(onsetData, null, 1024);
-        }
+        } 
 
         public IFrameData Summary(int displayScale)
         {

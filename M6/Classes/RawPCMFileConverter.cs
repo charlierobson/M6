@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace M6.Classes
 {
@@ -16,7 +16,7 @@ namespace M6.Classes
         public IFrameData ProcessFile()
         {
             var bytes = _fileSystemHelper.ReadAllBytes(_path);
-            var frames = bytes.Length/4;
+            var frames = bytes.Length / 4;
 
             var left = new float[frames];
             var right = new float[frames];
