@@ -4,12 +4,23 @@ namespace M6.Classes
 {
     public class Delta : IDelta
     {
-        private Point _lastPosition = new Point();
         private Size _magnitude;
+        private Point _lastPosition;
+
+        public Delta()
+        {
+        }
+
+        public Delta(Point p)
+        {
+            Reset(p);
+        }
 
         public void Reset(Point position)
         {
             _lastPosition = position;
+            _magnitude.Width = 0;
+            _magnitude.Height = 0;
         }
 
         public void Update(Point newPosition)
