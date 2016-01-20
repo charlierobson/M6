@@ -10,23 +10,11 @@ namespace M6.Classes
         {
             var max = new List<float>();
 
-            var sourceLength = input.Length;
-            var resampledFrameCount = sourceLength / ratio;
+            input.BeginChunkyRead(ratio);
 
-            for (var i = 0; i < resampledFrameCount; ++i)
+            IFrameDataSubset subset = null;
+            while(input.ReadChunk(ref subset))
             {
-                var subset = input.GetSubset(i * ratio, ratio);
-
-                var maxmag = Math.Max(subset.Left.Max(), subset.Right.Max());
-                var minmag = Math.Min(subset.Left.Min(), subset.Right.Min());
-                max.Add(Math.Max(maxmag, Math.Abs(minmag)));
-            }
-
-            var blockLen = sourceLength - resampledFrameCount * ratio;
-            if (blockLen != 0)
-            {
-                var subset = input.GetSubset(resampledFrameCount * ratio, blockLen);
-
                 var maxmag = Math.Max(subset.Left.Max(), subset.Right.Max());
                 var minmag = Math.Min(subset.Left.Min(), subset.Right.Min());
                 max.Add(Math.Max(maxmag, Math.Abs(minmag)));

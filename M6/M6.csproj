@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Classes\FileConverterFactory.cs" />
-    <Compile Include="Classes\Clip.cs" />
     <Compile Include="Classes\MP3FileConverter.cs" />
     <Compile Include="Classes\Delta.cs" />
     <Compile Include="Classes\Range.cs" />
@@ -62,6 +61,10 @@
     <Compile Include="Classes\IFileConverter.cs" />
     <Compile Include="Form\M6.cs" />
     <Compile Include="Classes\Position.cs" />
+    <Compile Include="Processing\OnsetDetection\AudioAnalysis.cs" />
+    <Compile Include="Processing\OnsetDetection\FFT.cs" />
+    <Compile Include="Processing\OnsetDetection\LomontFFT.cs" />
+    <Compile Include="Processing\OnsetDetection\OnsetDetection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\M6Form.resx">
       <DependentUpon>M6Form.cs</DependentUpon>

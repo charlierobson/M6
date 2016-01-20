@@ -35,12 +35,15 @@ namespace M6
 
         private void M6Form_Load(object sender, System.EventArgs e)
         {
-            //string[] tunes = { "paris red - good friend.mp3", "jinny - keep warm.mp3" };
+            //string[] tunes = { "C:/Users/Administrator/99s.mp3", "C:/Users/Administrator/99s.mp3" };
             //File.WriteAllText(".\\tunes.json", JsonConvert.SerializeObject(tunes));
 
-            var files = JsonConvert.DeserializeObject<string[]>(File.ReadAllText(".\\tunes.json"));
+            var tuneList = File.ReadAllText("c:\\tunes.json");
+            var files = JsonConvert.DeserializeObject<string[]>(tuneList);
             foreach (var file in files)
             {
+                Console.WriteLine("Convert mp3");
+
                 var converter = new FileConverterFactory(new FileSystemHelper()).ParseFile(file);
                 if (converter == null) continue;
 
@@ -48,6 +51,9 @@ namespace M6
                 if (waveData == null) continue;
 
                 var tune = new Tune(waveData);
+
+                Console.WriteLine("build summaries");
+
                 tune.BuildSummaries();
                 tune.StartTick = 0;
                 tune.Track = _tunes.Count;
@@ -59,8 +65,7 @@ namespace M6
 
             _ticksPerPixel = 1024;
 
-            var summaryData = _tunes[0].Summary(_ticksPerPixel);
-            _summaryBitmap = new SummaryBitmap(summaryData);
+            _summaryBitmap = new SummaryBitmap(_tunes[0].Summary(_ticksPerPixel), null);
 
             _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
 
@@ -105,7 +110,7 @@ namespace M6
                 var summaryData = tune.Summary(_ticksPerPixel);
                 if (summaryData.Resolution != _summaryBitmap.Resolution)
                 {
-                    _summaryBitmap = new SummaryBitmap(summaryData);
+                    _summaryBitmap = new SummaryBitmap(summaryData, tune.Onsets(_ticksPerPixel));
                 }
 
                 var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * 260, visibleTicks / _ticksPerPixel, 250);

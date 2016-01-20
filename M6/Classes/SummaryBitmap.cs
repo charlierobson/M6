@@ -5,7 +5,7 @@ namespace M6.Classes
 {
     public class SummaryBitmap : ISummaryBitmap
     {
-        private Bitmap _bitmap;
+        private readonly Bitmap _bitmap;
 
         public int Resolution { get; private set; }
 
@@ -14,7 +14,7 @@ namespace M6.Classes
             get { return _bitmap; }
         }
 
-        public SummaryBitmap(IFrameData summaryData)
+        public SummaryBitmap(IFrameData summaryData, IFrameData onsetData)
         {
             Resolution = summaryData.Resolution;
 
@@ -31,6 +31,19 @@ namespace M6.Classes
                 var d = (_bitmap.Height - h) / 2;
                 graphics.DrawLine(Pens.Black, x, d, x, _bitmap.Height - d);
                 ++x;
+            }
+
+            if (onsetData != null)
+            {
+                x = 0;
+                foreach (var m in onsetData.Left)
+                {
+                    if (m > 0)
+                    {
+                        graphics.DrawRectangle(Pens.Chartreuse, x, 0, x+1, _bitmap.Height);
+                    }
+                    ++x;
+                }
             }
         }
     }
