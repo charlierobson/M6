@@ -44,11 +44,15 @@
     <Compile Include="Classes\Range.cs" />
     <Compile Include="Classes\RawPCMFileConverter.cs" />
     <Compile Include="Classes\SummaryBitmap.cs" />
+    <Compile Include="Classes\SummaryCollection.cs" />
     <Compile Include="Classes\Tune.cs" />
     <Compile Include="Form\FileSystemHelper.cs" />
     <Compile Include="Classes\IWaveSummary.cs" />
     <Compile Include="Classes\WaveSummaryBuilder.cs" />
     <Compile Include="Classes\IDelta.cs" />
+    <Compile Include="Form\M6Form-On.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Form\M6Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,6 +68,7 @@
     <Compile Include="Classes\IFrameData.cs" />
     <Compile Include="Classes\IFileConverter.cs" />
     <Compile Include="Form\M6.cs" />
+    <Compile Include="Form\M6SampleProvider.cs" />
     <Compile Include="Processing\OnsetDetection\AudioAnalysis.cs" />
     <Compile Include="Processing\OnsetDetection\FFT.cs" />
     <Compile Include="Processing\OnsetDetection\LomontFFT.cs" />
@@ -87,6 +92,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>

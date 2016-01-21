@@ -13,7 +13,7 @@ namespace M6Tests
             mockFileSystemHelper.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
             mockFileSystemHelper.Setup(f => f.ReadAllBytes(It.IsAny<string>())).Returns(new byte[1234*2*2]);
 
-            var converter = new RawFloatPCMFileConverter("some path", mockFileSystemHelper.Object);
+            var converter = new RawPCMFileConverter("some path", mockFileSystemHelper.Object);
 
             var frameData = converter.ProcessFile();
 

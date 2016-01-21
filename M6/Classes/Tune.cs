@@ -1,20 +1,7 @@
 ﻿using M6.Processing.OnsetDetection;
-using ProtoBuf;
 
 namespace M6.Classes
 {
-    [ProtoContract]
-    public class SummaryCollection
-    {
-        [ProtoMember(1, OverwriteList = true)]
-        public readonly FrameData[] Summary;
-
-        public SummaryCollection()
-        {
-            Summary = new FrameData[3];
-        }
-    }
-
     public class Tune : ITune
     {
         private readonly IFrameData _frameData;
@@ -68,21 +55,21 @@ namespace M6.Classes
             else return SummaryCollection.Summary[0];
         }
 
+        public SummaryBitmap SummaryBitmap { get; set; }
+
         public IFrameData Onsets(int displayScale)
         {
             return _onsets;
         }
 
-        public Range Range
+        public Range TickRange
         {
             get { return new Range(StartTick, EndTick); }
         }
 
-        public SummaryBitmap SummaryBitmap { get; set; }
-
-        public float Data(int i)
+        public IFrameDataSubset Subset(int startTick, int count)
         {
-            return _frameData.Left[i];
+            return _frameData.GetSubset(startTick, count);
         }
     }
 }

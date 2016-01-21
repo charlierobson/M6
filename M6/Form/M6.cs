@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace M6
+namespace M6.Form
 {
     static class M6
     {

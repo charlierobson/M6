@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using M6.Classes;
 
-namespace M6
+namespace M6.Form
 {
     class FileSystemHelper : IFileSystemHelper
     {

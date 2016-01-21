@@ -15,6 +15,8 @@
         void BuildOnsets();
         IFrameData Onsets(int displayScale);
 
-        Range Range { get; }
+        Range TickRange { get; }
+
+        IFrameDataSubset Subset(int startTick, int count);
     }
 }

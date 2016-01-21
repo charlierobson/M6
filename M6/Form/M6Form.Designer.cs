@@ -1,4 +1,4 @@
-﻿namespace M6
+﻿namespace M6.Form
 {
     partial class M6Form
     {
