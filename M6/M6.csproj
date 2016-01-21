@@ -110,6 +110,10 @@
       <Project>{da4f02e3-0b5e-42cd-b8d9-5583fa51d66e}</Project>
       <Name>NAudio</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\SRC.NET\SRC.NET\LibSampleRate\LibSampleRate.csproj">
+      <Project>{cb8480b3-68e5-4a77-ba83-a5b4911a675c}</Project>
+      <Name>LibSampleRate</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
