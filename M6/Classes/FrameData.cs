@@ -51,9 +51,14 @@ namespace M6.Classes
             _chunkReadSize = chunkSize;
         }
 
-        public bool ReadChunk(ref IFrameDataSubset subset)
+        public bool ReadChunk(ref IFrameDataSubset subset, int overrideChunkSize = 0)
         {
             if (_chunkReadIndex >= Left.Length) return false;
+
+            if (overrideChunkSize != 0)
+            {
+                _chunkReadSize = overrideChunkSize;
+            }
 
             var readSize = _chunkReadSize;
             var readIndex = _chunkReadIndex;

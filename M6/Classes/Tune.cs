@@ -67,6 +67,11 @@ namespace M6.Classes
             get { return new Range(StartTick, EndTick); }
         }
 
+        public IFrameData FrameData
+        {
+            get { return _frameData; }
+        }
+
         public IFrameDataSubset Subset(int startTick, int count)
         {
             return _frameData.GetSubset(startTick, count);

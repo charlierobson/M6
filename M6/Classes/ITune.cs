@@ -17,6 +17,7 @@
 
         Range TickRange { get; }
 
+        IFrameData FrameData { get; }
         IFrameDataSubset Subset(int startTick, int count);
     }
 }

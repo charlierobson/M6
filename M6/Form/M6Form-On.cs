@@ -25,6 +25,7 @@ namespace M6.Form
         private int _ticksPerPixel;
         private Range _desktopRange;
         private Tune _selectedTune;
+        private bool _playing;
 
         private void On_Load()
         {
@@ -35,95 +36,96 @@ namespace M6.Form
 
             var fileConverterFactory = new FileConverterFactory(new FileSystemHelper());
 
-            var project = Project.OpenProject(@".\TestProject\");
-
-            foreach (var fileName in project.TuneFilenames)
+            try
             {
-                var metaDataPath = Path.Combine(project.WorkingFolder, "MetaData");
-                Directory.CreateDirectory(metaDataPath);
+                var project = Project.OpenProject(Path.Combine(Directory.GetCurrentDirectory(), "TestProject"));
 
-                var tunePath = Path.Combine(project.WorkingFolder, fileName);
-
-                var rawTunePath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "m6raw");
-                var summaryPath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "summary");
-
-                IFileConverter converter;
-                if ((converter = fileConverterFactory.ParseFile(rawTunePath)) == null)
+                foreach (var fileName in project.TuneFilenames)
                 {
-                    converter = fileConverterFactory.ParseFile(tunePath);
-                }
-                if (converter == null) continue;
+                    var metaDataPath = Path.Combine(project.WorkingFolder, "MetaData");
+                    Directory.CreateDirectory(metaDataPath);
 
-                var waveData = converter.ProcessFile();
-                if (waveData == null) continue;
+                    var tunePath = Path.Combine(project.WorkingFolder, fileName);
 
-                if (!File.Exists(rawTunePath))
-                {
+                    var rawTunePath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "m6raw");
+                    var summaryPath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "summary");
+
+                    IFileConverter converter;
+                    if ((converter = fileConverterFactory.ParseFile(rawTunePath)) == null)
+                    {
+                        converter = fileConverterFactory.ParseFile(tunePath);
+                    }
+                    if (converter == null) continue;
+
+                    var waveData = converter.ProcessFile();
+                    if (waveData == null) continue;
+
+                    if (!File.Exists(rawTunePath))
+                    {
+                        try
+                        {
+                            using (var rawFile = File.Create(rawTunePath))
+                            {
+                                Serializer.Serialize(rawFile, waveData);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
+                        }
+                    }
+
+                    var tune = new Tune(waveData);
+
+                    SummaryCollection summaryData = null;
                     try
                     {
-                        using (var rawFile = File.Create(rawTunePath))
+                        using (var summaryFile = File.OpenRead(summaryPath))
                         {
-                            Serializer.Serialize(rawFile, waveData);
+                            summaryData = Serializer.Deserialize<SummaryCollection>(summaryFile);
                         }
+
+                        tune.SummaryCollection = summaryData;
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex);
                     }
-                }
 
-                var tune = new Tune(waveData);
-
-                SummaryCollection summaryData = null;
-                try
-                {
-                    using (var summaryFile = File.OpenRead(summaryPath))
+                    if (summaryData == null)
                     {
-                        summaryData = Serializer.Deserialize<SummaryCollection>(summaryFile);
-                    }
-
-                    tune.SummaryCollection = summaryData;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-
-                if (summaryData == null)
-                {
-                    tune.BuildSummaries();
-                    try
-                    {
-                        using (var summaryFile = File.Create(summaryPath))
+                        tune.BuildSummaries();
+                        try
                         {
-                            Serializer.Serialize(summaryFile, tune.SummaryCollection);
+                            using (var summaryFile = File.Create(summaryPath))
+                            {
+                                Serializer.Serialize(summaryFile, tune.SummaryCollection);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
+
+                    tune.StartTick = 0;
+                    tune.Track = _tunes.Count;
+
+                    _tunes.Add(tune);
                 }
 
-                tune.StartTick = 0;
-                tune.Track = _tunes.Count;
+                _delta = new Delta();
 
-                _tunes.Add(tune);
+                _ticksPerPixel = 1024;
+
+                _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
+
+                _desktopRange = new Range(0, ClientRectangle.Width*_ticksPerPixel);
             }
-
-            _delta = new Delta();
-
-            _ticksPerPixel = 1024;
-
-            _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
-
-            _desktopRange = new Range(0, ClientRectangle.Width * _ticksPerPixel);
-
-            var w = new WaveOut();
-            w.Init(new M6SampleProvider(_tunes[1]));
-            w.Play();
-            System.Threading.Thread.Sleep(2000);
-            w.Stop();
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void Logout(Graphics g = null, string format = null, params object[] parameters)
@@ -161,8 +163,6 @@ namespace M6.Form
                 var tuneRange = tune.TickRange;
                 if (!_desktopRange.ContainsOrIntersectsWithRange(tuneRange)) continue;
 
-                Logout(backbuffer, "{0}", tune.Track);
-
                 var firstVisibleTuneTick = Math.Max(_desktopRange.Minimum, tune.StartTick);
                 var firstVisibleTunePixel = (firstVisibleTuneTick - _desktopRange.Minimum) / _ticksPerPixel;
 
@@ -181,8 +181,18 @@ namespace M6.Form
                 backbuffer.DrawImage(tune.SummaryBitmap.Bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
             }
 
-            Logout(backbuffer, "tpp {0}", _ticksPerPixel);
+            var x = TickToPixel(_playCursor);
+            backbuffer.DrawLine(Pens.Red, x, 0, x, ClientRectangle.Height);
+
+            x = TickToPixel(_playPosition);
+            backbuffer.DrawLine(Pens.Orange, x, 0, x, ClientRectangle.Height);
+
             e.Graphics.DrawImage(_bbBitmap, 0, 0);
+        }
+
+        private int TickToPixel(int tick)
+        {
+            return (tick - _desktopRange.Minimum)/_ticksPerPixel;
         }
 
 
@@ -198,9 +208,14 @@ namespace M6.Form
             _leftButtonDown = true;
             _delta.Reset(e.Location);
 
-            var tick = _desktopRange.Minimum + e.Location.X * _ticksPerPixel;
+            var clickedTick = _desktopRange.Minimum + e.Location.X * _ticksPerPixel;
 
-            _selectedTune = _tunes.FirstOrDefault(tune => tune.TickRange.ContainsValue(tick) && new Range(100 + tune.Track * 260, 100 + (tune.Track + 1) * 260).ContainsValue(e.Location.Y));
+            _selectedTune = _tunes.FirstOrDefault(tune => tune.TickRange.ContainsValue(clickedTick) && new Range(100 + tune.Track * 260, 100 + (tune.Track + 1) * 260).ContainsValue(e.Location.Y));
+
+            if (_selectedTune == null)
+            {
+                _playCursor = clickedTick;
+            }
 
             Invalidate();
         }
@@ -239,6 +254,8 @@ namespace M6.Form
             if (_selectedTune != null)
             {
                 _selectedTune.StartTick += dist;
+                if (_selectedTune.StartTick < 0)
+                    _selectedTune.StartTick = 0;
             }
             else
             {
@@ -265,6 +282,40 @@ namespace M6.Form
             _desktopRange.Minimum = _tunes.Select(tune => tune.StartTick).Concat(new[] { Int32.MaxValue }).Min();
             _ticksPerPixel = _desktopRange.Width / ClientRectangle.Width;
             Invalidate();
+        }
+
+        WaveOut _w;
+        private int _playPosition;
+        private int _playCursor;
+
+        private void On_buttonPlay_Click(object sender)
+        {
+            var buttonSender = (Button)sender;
+
+            _playing = !_playing;
+
+            if (_playing)
+            {
+                buttonSender.Text = "Stop";
+
+                _w = new WaveOut();
+                _w.Init(new M6SampleProvider(_tunes[1], _playCursor, InvokeCursorUpdate));
+                _w.Play();
+            }
+            else
+            {
+                buttonSender.Text = "Play";
+
+                _w.Stop();
+                _w.Dispose();
+                _w = null;
+            }
+        }
+
+        private void InvokeCursorUpdate(int position)
+        {
+            _playPosition = position;
+            Invalidate(new Rectangle(0, 0, 200, 100));
         }
     }
 }

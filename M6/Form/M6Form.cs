@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Forms;
-using M6.Classes;
 
 namespace M6.Form
 {
@@ -56,6 +53,20 @@ namespace M6.Form
         private void buttonFit_Click(object sender, EventArgs e)
         {
             On_buttonFit_Click();
+        }
+
+        private void buttonPlay_Click(object sender, EventArgs e)
+        {
+            On_buttonPlay_Click(sender);
+        }
+
+        private void M6Form_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (_w == null) return;
+
+            _w.Stop();
+            _w.Dispose();
+            _w = null;
         }
     }
 }

@@ -12,6 +12,6 @@ namespace M6.Classes
         IFrameDataSubset GetSubset(int start, int count);
 
         void BeginChunkyRead(int chunkSize);
-        bool ReadChunk(ref IFrameDataSubset subset);
+        bool ReadChunk(ref IFrameDataSubset subset, int overrideChunkSize = 0);
     }
 }

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.buttonFit = new System.Windows.Forms.Button();
+            this.buttonPlay = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonFit
@@ -42,14 +43,27 @@
             this.buttonFit.UseVisualStyleBackColor = true;
             this.buttonFit.Click += new System.EventHandler(this.buttonFit_Click);
             // 
+            // buttonPlay
+            // 
+            this.buttonPlay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonPlay.Location = new System.Drawing.Point(969, 433);
+            this.buttonPlay.Name = "buttonPlay";
+            this.buttonPlay.Size = new System.Drawing.Size(75, 23);
+            this.buttonPlay.TabIndex = 1;
+            this.buttonPlay.Text = "Play";
+            this.buttonPlay.UseVisualStyleBackColor = true;
+            this.buttonPlay.Click += new System.EventHandler(this.buttonPlay_Click);
+            // 
             // M6Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1056, 497);
+            this.Controls.Add(this.buttonPlay);
             this.Controls.Add(this.buttonFit);
             this.Name = "M6Form";
             this.Text = "M6";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.M6Form_FormClosing);
             this.Load += new System.EventHandler(this.M6Form_Load);
             this.ResizeEnd += new System.EventHandler(this.M6Form_ResizeEnd);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.M6Form_Paint);
@@ -63,6 +77,7 @@
         #endregion
 
         private System.Windows.Forms.Button buttonFit;
+        private System.Windows.Forms.Button buttonPlay;
     }
 }
 
