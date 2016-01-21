@@ -35,7 +35,7 @@ namespace M6.Form
 
             var fileConverterFactory = new FileConverterFactory(new FileSystemHelper());
 
-            var project = Project.OpenProject(@"C:\Users\Administrator\repro\");
+            var project = Project.OpenProject(@".\TestProject\");
 
             foreach (var fileName in project.TuneFilenames)
             {
@@ -124,26 +124,6 @@ namespace M6.Form
             w.Play();
             System.Threading.Thread.Sleep(2000);
             w.Stop();
-        }
-
-        public class M6WaveProvider : WaveStream
-        {
-            public override int Read(byte[] buffer, int offset, int count)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override WaveFormat WaveFormat
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override long Length
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public override long Position { get; set; }
         }
 
         private void Logout(Graphics g = null, string format = null, params object[] parameters)
