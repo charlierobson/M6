@@ -10,7 +10,8 @@ namespace M6.Form
 
         private readonly ITune _tune;
         private readonly Action<int> _update;
-        private readonly IFrameDataSubset _subset;
+
+        private IFrameDataSubset _subset;
 
         public M6SampleProvider(ITune tune, int playCursorTick, Action<int> update)
         {
@@ -26,18 +27,18 @@ namespace M6.Form
         {
             lock (_lockObject)
             {
+                if (!_tune.FrameData.ReadChunk(ref _subset, count)) return 0;
+
                 var i = 0;
-                IFrameDataSubset subset = null;
-                _tune.FrameData.ReadChunk(ref subset, count);
-                foreach (var sample in subset.Left)
+                foreach (var sample in _subset.Left)
                 {
                     buffer[i] = sample;
                     ++i;
                 }
 
-                _update(subset.Left.Offset);
+                _update(_subset.Left.Offset);
 
-                return count;
+                return _subset.Left.Count;
             }
         }
     }

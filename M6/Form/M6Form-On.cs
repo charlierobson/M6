@@ -184,7 +184,7 @@ namespace M6.Form
             var x = TickToPixel(_playCursor);
             backbuffer.DrawLine(Pens.Red, x, 0, x, ClientRectangle.Height);
 
-            x = TickToPixel(_playPosition);
+            x = TickToPixel(_playbackPosition);
             backbuffer.DrawLine(Pens.Orange, x, 0, x, ClientRectangle.Height);
 
             e.Graphics.DrawImage(_bbBitmap, 0, 0);
@@ -285,7 +285,7 @@ namespace M6.Form
         }
 
         WaveOut _w;
-        private int _playPosition;
+        private int _playbackPosition;
         private int _playCursor;
 
         private void On_buttonPlay_Click(object sender)
@@ -299,7 +299,7 @@ namespace M6.Form
                 buttonSender.Text = "Stop";
 
                 _w = new WaveOut();
-                _w.Init(new M6SampleProvider(_tunes[1], _playCursor, InvokeCursorUpdate));
+                _w.Init(new M6SampleProvider(_tunes[0], _playCursor, InvokeCursorUpdate));
                 _w.Play();
             }
             else
@@ -314,7 +314,7 @@ namespace M6.Form
 
         private void InvokeCursorUpdate(int position)
         {
-            _playPosition = position;
+            _playbackPosition = position;
             Invalidate(new Rectangle(0, 0, 200, 100));
         }
     }
