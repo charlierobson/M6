@@ -299,7 +299,7 @@ namespace M6.Form
                 buttonSender.Text = "Stop";
 
                 _w = new WaveOut();
-                _w.Init(new M6SampleProvider(_tunes[0], _playCursor, InvokeCursorUpdate));
+                _w.Init(new M6SampleProvider(_tunes[1], _playCursor, InvokeCursorUpdate));
                 _w.Play();
             }
             else
