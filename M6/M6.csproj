@@ -37,6 +37,7 @@
     <Compile Include="Classes\FileConverterFactory.cs" />
     <Compile Include="Classes\FrameDataSubset.cs" />
     <Compile Include="Classes\IFrameDataSubset.cs" />
+    <Compile Include="Classes\InterleavedSampleData.cs" />
     <Compile Include="Classes\ITune.cs" />
     <Compile Include="Classes\MP3FileConverter.cs" />
     <Compile Include="Classes\Delta.cs" />
@@ -62,8 +63,6 @@
     <Compile Include="Classes\FrameData.cs" />
     <Compile Include="Classes\RawFloatPCMFileConverter.cs" />
     <Compile Include="Classes\IFileConverterFactory.cs" />
-    <Compile Include="Classes\IClip.cs" />
-    <Compile Include="Classes\IClipFactory.cs" />
     <Compile Include="Classes\IFileSystemHelper.cs" />
     <Compile Include="Classes\IFrameData.cs" />
     <Compile Include="Classes\IFileConverter.cs" />
