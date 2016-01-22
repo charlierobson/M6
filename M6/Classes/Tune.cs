@@ -19,11 +19,11 @@ namespace M6.Classes
 
         public int Ticks
         {
-            get { return _frameData.Length; }
+            get { return (int)(BitRate / 44100 * _frameData.Length); }
         }
 
         public int Track { get; set; }
-        public double Rate { get; set; }
+        public double BitRate { get; set; }
 
         public Tune(IFrameData frameData)
         {

@@ -44,6 +44,7 @@
     <Compile Include="Classes\Project.cs" />
     <Compile Include="Classes\Range.cs" />
     <Compile Include="Classes\RawPCMFileConverter.cs" />
+    <Compile Include="Classes\Resampler.cs" />
     <Compile Include="Classes\SummaryBitmap.cs" />
     <Compile Include="Classes\SummaryCollection.cs" />
     <Compile Include="Classes\Tune.cs" />
@@ -67,7 +68,7 @@
     <Compile Include="Classes\IFrameData.cs" />
     <Compile Include="Classes\IFileConverter.cs" />
     <Compile Include="Form\M6.cs" />
-    <Compile Include="Form\M6SampleProvider.cs" />
+    <Compile Include="Classes\M6SampleProvider.cs" />
     <Compile Include="Processing\OnsetDetection\AudioAnalysis.cs" />
     <Compile Include="Processing\OnsetDetection\FFT.cs" />
     <Compile Include="Processing\OnsetDetection\LomontFFT.cs" />

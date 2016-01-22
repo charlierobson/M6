@@ -68,5 +68,10 @@ namespace M6.Form
             _w.Dispose();
             _w = null;
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            On_TestButton();
+        }
     }
 }

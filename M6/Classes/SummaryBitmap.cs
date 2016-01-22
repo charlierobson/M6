@@ -14,11 +14,13 @@ namespace M6.Classes
             get { return _bitmap; }
         }
 
-        public SummaryBitmap(IFrameData summaryData, IFrameData onsetData)
+        public SummaryBitmap(IFrameData summaryData, int summaryHeight, IFrameData onsetData)
         {
             Resolution = summaryData.Resolution;
 
-            _bitmap = new Bitmap(summaryData.Length, 250, PixelFormat.Format24bppRgb);
+            _bitmap = new Bitmap(summaryData.Length, summaryHeight, PixelFormat.Format24bppRgb);
+
+            summaryHeight -= 6;
 
             var graphics = Graphics.FromImage(_bitmap);
             graphics.Clear(Color.CadetBlue);
@@ -27,7 +29,7 @@ namespace M6.Classes
             var x = 0;
             foreach (var m in summaryData.Left)
             {
-                var h = 240 * m;
+                var h = summaryHeight * m;
                 var d = (_bitmap.Height - h) / 2;
                 graphics.DrawLine(Pens.Black, x, d, x, _bitmap.Height - d);
                 ++x;

@@ -7,7 +7,7 @@
         int Ticks { get; }
         int Track { get; }
 
-        double Rate { get; set; }
+        double BitRate { get; set; }
 
         void BuildSummaries();
         IFrameData Summary(int displayScale);

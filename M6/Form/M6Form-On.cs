@@ -1,17 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using M6.Classes;
 using NAudio.Wave;
-using ProtoBuf;
+using Newtonsoft.Json;
+
+// ReSharper disable LocalizableElement
 
 namespace M6.Form
 {
     public partial class M6Form
     {
+        private const int WfHeight = 125;
+
         private bool _leftButtonDown;
 
         private int _logy;
@@ -20,8 +23,6 @@ namespace M6.Form
 
         private Delta _delta;
 
-        private List<Tune> _tunes;
-
         private int _ticksPerPixel;
         private Range _desktopRange;
         private Tune _selectedTune;
@@ -29,90 +30,16 @@ namespace M6.Form
 
         private void On_Load()
         {
-            _tunes = new List<Tune>();
-
-            //var p = new Project { TuneFilenames = new[] { "abc", "def" } };
-            //string x = JsonConvert.SerializeObject(p);
-
-            var fileConverterFactory = new FileConverterFactory(new FileSystemHelper());
+            var p = new TuneSeed[]
+            {
+                new TuneSeed(){BitRate = 44100, Filename = "1", StartTick = 123},
+                new TuneSeed(){BitRate = 44100, Filename = "2", StartTick = 123}
+            };
+            var x = JsonConvert.SerializeObject(p);
 
             try
             {
-                var project = Project.OpenProject(Path.Combine(Directory.GetCurrentDirectory(), "TestProject"));
-
-                foreach (var fileName in project.TuneFilenames)
-                {
-                    var metaDataPath = Path.Combine(project.WorkingFolder, "MetaData");
-                    Directory.CreateDirectory(metaDataPath);
-
-                    var tunePath = Path.Combine(project.WorkingFolder, fileName);
-
-                    var rawTunePath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "m6raw");
-                    var summaryPath = Path.ChangeExtension(Path.Combine(metaDataPath, fileName), "summary");
-
-                    IFileConverter converter;
-                    if ((converter = fileConverterFactory.ParseFile(rawTunePath)) == null)
-                    {
-                        converter = fileConverterFactory.ParseFile(tunePath);
-                    }
-                    if (converter == null) continue;
-
-                    var waveData = converter.ProcessFile();
-                    if (waveData == null) continue;
-
-                    if (!File.Exists(rawTunePath))
-                    {
-                        try
-                        {
-                            using (var rawFile = File.Create(rawTunePath))
-                            {
-                                Serializer.Serialize(rawFile, waveData);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex);
-                        }
-                    }
-
-                    var tune = new Tune(waveData);
-
-                    SummaryCollection summaryData = null;
-                    try
-                    {
-                        using (var summaryFile = File.OpenRead(summaryPath))
-                        {
-                            summaryData = Serializer.Deserialize<SummaryCollection>(summaryFile);
-                        }
-
-                        tune.SummaryCollection = summaryData;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-
-                    if (summaryData == null)
-                    {
-                        tune.BuildSummaries();
-                        try
-                        {
-                            using (var summaryFile = File.Create(summaryPath))
-                            {
-                                Serializer.Serialize(summaryFile, tune.SummaryCollection);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex);
-                        }
-                    }
-
-                    tune.StartTick = 0;
-                    tune.Track = _tunes.Count;
-
-                    _tunes.Add(tune);
-                }
+                _project = Project.OpenProject(Path.Combine(Directory.GetCurrentDirectory(), "TestProject"));
 
                 _delta = new Delta();
 
@@ -120,11 +47,11 @@ namespace M6.Form
 
                 _bbBitmap = new Bitmap(ClientRectangle.Width, ClientRectangle.Height);
 
-                _desktopRange = new Range(0, ClientRectangle.Width*_ticksPerPixel);
+                _desktopRange = new Range(0, ClientRectangle.Width * _ticksPerPixel);
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show(ex.Message);
+                //
             }
         }
 
@@ -158,7 +85,7 @@ namespace M6.Form
 
             Logout();
 
-            foreach (var tune in _tunes)
+            foreach (var tune in _project.Tunes)
             {
                 var tuneRange = tune.TickRange;
                 if (!_desktopRange.ContainsOrIntersectsWithRange(tuneRange)) continue;
@@ -172,20 +99,17 @@ namespace M6.Form
                 var summaryData = tune.Summary(_ticksPerPixel);
                 if (tune.SummaryBitmap == null || summaryData.Resolution != tune.SummaryBitmap.Resolution)
                 {
-                    tune.SummaryBitmap = new SummaryBitmap(summaryData, tune.Onsets(_ticksPerPixel));
+                    tune.SummaryBitmap = new SummaryBitmap(summaryData, WfHeight, tune.Onsets(_ticksPerPixel));
                 }
 
-                var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * 260, visibleTicks / _ticksPerPixel, 250);
-                var srcRect = new Rectangle(tickOffsetIntoTune / tune.SummaryBitmap.Resolution, 0, visibleTicks / tune.SummaryBitmap.Resolution, 250);
+                var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * (WfHeight + 10), visibleTicks / _ticksPerPixel, WfHeight);
+                var srcRect = new Rectangle(tickOffsetIntoTune / tune.SummaryBitmap.Resolution, 0, visibleTicks / tune.SummaryBitmap.Resolution, WfHeight);
 
                 backbuffer.DrawImage(tune.SummaryBitmap.Bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
             }
 
             var x = TickToPixel(_playCursor);
             backbuffer.DrawLine(Pens.Red, x, 0, x, ClientRectangle.Height);
-
-            x = TickToPixel(_playbackPosition);
-            backbuffer.DrawLine(Pens.Orange, x, 0, x, ClientRectangle.Height);
 
             e.Graphics.DrawImage(_bbBitmap, 0, 0);
         }
@@ -210,7 +134,7 @@ namespace M6.Form
 
             var clickedTick = _desktopRange.Minimum + e.Location.X * _ticksPerPixel;
 
-            _selectedTune = _tunes.FirstOrDefault(tune => tune.TickRange.ContainsValue(clickedTick) && new Range(100 + tune.Track * 260, 100 + (tune.Track + 1) * 260).ContainsValue(e.Location.Y));
+            _selectedTune = _project.Tunes.FirstOrDefault(tune => tune.TickRange.ContainsValue(clickedTick) && new Range(100 + tune.Track * (WfHeight + 10), 100 + (tune.Track + 1) * (WfHeight + 10)).ContainsValue(e.Location.Y));
 
             if (_selectedTune == null)
             {
@@ -278,15 +202,15 @@ namespace M6.Form
 
         private void On_buttonFit_Click()
         {
-            _desktopRange.Maximum = _tunes.Select(tune => tune.EndTick).Concat(new[] { 0 }).Max();
-            _desktopRange.Minimum = _tunes.Select(tune => tune.StartTick).Concat(new[] { Int32.MaxValue }).Min();
+            _desktopRange.Maximum = _project.Tunes.Select(tune => tune.EndTick).Concat(new[] { 0 }).Max();
+            _desktopRange.Minimum = _project.Tunes.Select(tune => tune.StartTick).Concat(new[] { Int32.MaxValue }).Min();
             _ticksPerPixel = _desktopRange.Width / ClientRectangle.Width;
             Invalidate();
         }
 
         WaveOut _w;
-        private int _playbackPosition;
         private int _playCursor;
+        private Project _project;
 
         private void On_buttonPlay_Click(object sender)
         {
@@ -299,7 +223,7 @@ namespace M6.Form
                 buttonSender.Text = "Stop";
 
                 _w = new WaveOut();
-                _w.Init(new M6SampleProvider(_tunes[1], _playCursor, InvokeCursorUpdate));
+                _w.Init(new M6SampleProvider(_project.Tunes[1], _playCursor));
                 _w.Play();
             }
             else
@@ -312,10 +236,23 @@ namespace M6.Form
             }
         }
 
-        private void InvokeCursorUpdate(int position)
+        private void On_TestButton()
         {
-            _playbackPosition = position;
-            Invalidate(new Rectangle(0, 0, 200, 100));
+            if (_w != null)
+            {
+                _w.Stop();
+                _w.Dispose();
+                _w = null;
+            }
+            else
+            {
+                _project.Tunes[1].StartTick += 0x200;
+                Invalidate();
+
+                _w = new WaveOut();
+                _w.Init(new M6SampleProvider(_project.Tunes[1], 0));
+                _w.Play();
+            }
         }
     }
 }
