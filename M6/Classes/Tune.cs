@@ -23,6 +23,7 @@ namespace M6.Classes
         }
 
         public int Track { get; set; }
+
         public double BitRate { get; set; }
 
         public Tune(IFrameData frameData)
