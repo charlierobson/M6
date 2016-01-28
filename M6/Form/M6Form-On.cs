@@ -17,16 +17,16 @@ namespace M6.Form
 
         private bool _leftButtonDown;
 
-        private int _logy;
-
-        private Bitmap _bbBitmap;
-
-        private Delta _delta;
-
+        private int _logY;
         private int _ticksPerPixel;
+        private int _playCursor;
+
+        private WaveOut _waveOut;
+        private Bitmap _bbBitmap;
+        private Delta _delta;
+        private Project _project;
         private Range _desktopRange;
         private Tune _selectedTune;
-        private bool _playing;
 
         private void On_Load()
         {
@@ -59,13 +59,13 @@ namespace M6.Form
         {
             if (g == null || format == null)
             {
-                _logy = 30;
+                _logY = 30;
                 return;
             }
 
             var text = string.Format(format, parameters);
-            g.DrawString(text, DefaultFont, new SolidBrush(Color.Black), 10, _logy);
-            _logy += 15;
+            g.DrawString(text, DefaultFont, new SolidBrush(Color.Black), 10, _logY);
+            _logY += 15;
         }
 
         private void On_Paint(PaintEventArgs e)
@@ -224,21 +224,15 @@ namespace M6.Form
             Invalidate();
         }
 
-        WaveOut _w;
-        private int _playCursor;
-        private Project _project;
-
         private void On_buttonPlay_Click(object sender)
         {
             var buttonSender = (Button)sender;
 
-            _playing = !_playing;
-
-            if (_playing)
+            if (_waveOut == null)
             {
                 buttonSender.Text = "Stop";
 
-                _w = new WaveOut();
+                _waveOut = new WaveOut();
 
                 var providers = new[]
                 {
@@ -246,16 +240,16 @@ namespace M6.Form
                     new M6SampleProvider(_project.Tunes[1], _playCursor)
                 };
 
-                _w.Init(new MixingSampleProvider(providers));
-                _w.Play();
+                _waveOut.Init(new MixingSampleProvider(providers));
+                _waveOut.Play();
             }
             else
             {
                 buttonSender.Text = "Play";
 
-                _w.Stop();
-                _w.Dispose();
-                _w = null;
+                _waveOut.Stop();
+                _waveOut.Dispose();
+                _waveOut = null;
             }
         }
 

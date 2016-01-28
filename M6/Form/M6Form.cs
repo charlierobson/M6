@@ -62,11 +62,11 @@ namespace M6.Form
 
         private void M6Form_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_w == null) return;
+            if (_waveOut == null) return;
 
-            _w.Stop();
-            _w.Dispose();
-            _w = null;
+            _waveOut.Stop();
+            _waveOut.Dispose();
+            _waveOut = null;
         }
 
         private void button1_Click(object sender, EventArgs e)
