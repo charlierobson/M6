@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using M6.Classes;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using Newtonsoft.Json;
 
 // ReSharper disable LocalizableElement
 
@@ -30,12 +31,12 @@ namespace M6.Form
 
         private void On_Load()
         {
-            //var p = new TuneSeed[]
-            //{
-            //    new TuneSeed(){BitRate = 44100, Filename = "1", StartTick = 123},
-            //    new TuneSeed(){BitRate = 44100, Filename = "2", StartTick = 123}
-            //};
-            //var x = JsonConvert.SerializeObject(p);
+			//var p = new TuneSeed[]
+			//{
+			//	new TuneSeed(){BitRate = 44100, Filename = "1", StartTick = 123},
+			//	new TuneSeed(){BitRate = 44100, Filename = "2", StartTick = 123}
+			//};
+			//var x = JsonConvert.SerializeObject(p);
 
             try
             {
