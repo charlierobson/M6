@@ -18,7 +18,7 @@ namespace M6.Classes
         {
             Resolution = summaryData.Resolution;
 
-            _bitmap = new Bitmap(summaryData.Length, summaryHeight, PixelFormat.Format24bppRgb);
+            _bitmap = new Bitmap(summaryData.Frames, summaryHeight, PixelFormat.Format24bppRgb);
 
             summaryHeight -= 6;
 

@@ -17,7 +17,7 @@ namespace M6Tests
 
             var frameData = converter.ProcessFile();
 
-            Assert.Equal(1234, frameData.Length);
+            Assert.Equal(1234, frameData.Frames);
         }
     }
 }

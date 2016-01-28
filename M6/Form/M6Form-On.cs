@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using M6.Classes;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 // ReSharper disable LocalizableElement
 
@@ -90,10 +91,11 @@ namespace M6.Form
                 if (!_desktopRange.ContainsOrIntersectsWithRange(tuneRange)) continue;
 
                 var firstVisibleTuneTick = Math.Max(_desktopRange.Minimum, tune.StartTick);
+                var visibleTicks = Math.Min(_desktopRange.Width, Math.Min(_desktopRange.Maximum - tune.StartTick, tune.EndTick - _desktopRange.Minimum));
+
                 var firstVisibleTunePixel = (firstVisibleTuneTick - _desktopRange.Minimum) / _ticksPerPixel;
 
-                var tickOffsetIntoTune = Math.Max(0, _desktopRange.Minimum - tune.StartTick);
-                var visibleTicks = Math.Min(_desktopRange.Width, Math.Min(_desktopRange.Maximum - tune.StartTick, tune.EndTick - _desktopRange.Minimum));
+                var frameRange = tune.TickRangeToFrameRange(firstVisibleTuneTick, visibleTicks);
 
                 var summaryData = tune.Summary(_ticksPerPixel);
                 if (tune.SummaryBitmap == null || summaryData.Resolution != tune.SummaryBitmap.Resolution)
@@ -102,9 +104,14 @@ namespace M6.Form
                 }
 
                 var dstRect = new Rectangle(firstVisibleTunePixel, 100 + tune.Track * (WfHeight + 10), visibleTicks / _ticksPerPixel, WfHeight);
-                var srcRect = new Rectangle(tickOffsetIntoTune / tune.SummaryBitmap.Resolution, 0, visibleTicks / tune.SummaryBitmap.Resolution, WfHeight);
+                var srcRect = new Rectangle(frameRange.Minimum / tune.SummaryBitmap.Resolution, 0, frameRange.Width / tune.SummaryBitmap.Resolution, WfHeight);
 
                 backbuffer.DrawImage(tune.SummaryBitmap.Bitmap, dstRect, srcRect, GraphicsUnit.Pixel);
+                if (_selectedTune == tune)
+                {
+                    backbuffer.DrawRectangle(Pens.Aqua, dstRect.X, dstRect.Y, dstRect.Width - 1, dstRect.Height - 1);
+                    backbuffer.DrawRectangle(Pens.Aqua, dstRect.X, dstRect.Y+1, dstRect.Width - 1, dstRect.Height - 3);
+                }
             }
 
             var x = TickToPixel(_playCursor);
@@ -147,22 +154,32 @@ namespace M6.Form
         {
             base.OnMouseWheel(e);
 
-            var fraction = (double)e.Location.X / ClientRectangle.Width;
-            var tickAtCursor = _desktopRange.Minimum + (e.Location.X * _ticksPerPixel);
-
-            if (_ticksPerPixel + e.Delta <= 128) return;
-
-            _ticksPerPixel += e.Delta;
-
-            var newTickWidth = ClientRectangle.Width * _ticksPerPixel;
-
-            _desktopRange.Minimum = (int)(tickAtCursor - (newTickWidth * fraction));
-            _desktopRange.Maximum = _desktopRange.Minimum + newTickWidth;
-
-            if (_desktopRange.Minimum < 0)
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
             {
-                _desktopRange.Minimum = 0;
-                _desktopRange.Maximum = newTickWidth;
+                if (_selectedTune != null)
+                {
+                    _selectedTune.BitRate += e.Delta / 8;
+                }
+            }
+            else
+            {
+                var fraction = (double) e.Location.X/ClientRectangle.Width;
+                var tickAtCursor = _desktopRange.Minimum + (e.Location.X*_ticksPerPixel);
+
+                if (_ticksPerPixel + e.Delta <= 128) return;
+
+                _ticksPerPixel += e.Delta;
+
+                var newTickWidth = ClientRectangle.Width*_ticksPerPixel;
+
+                _desktopRange.Minimum = (int) (tickAtCursor - (newTickWidth*fraction));
+                _desktopRange.Maximum = _desktopRange.Minimum + newTickWidth;
+
+                if (_desktopRange.Minimum < 0)
+                {
+                    _desktopRange.Minimum = 0;
+                    _desktopRange.Maximum = newTickWidth;
+                }
             }
             Invalidate();
         }
@@ -222,7 +239,14 @@ namespace M6.Form
                 buttonSender.Text = "Stop";
 
                 _w = new WaveOut();
-                _w.Init(new M6SampleProvider(_project.Tunes[1], _playCursor));
+
+                var providers = new[]
+                {
+                    new M6SampleProvider(_project.Tunes[0], _playCursor),
+                    new M6SampleProvider(_project.Tunes[1], _playCursor)
+                };
+
+                _w.Init(new MixingSampleProvider(providers));
                 _w.Play();
             }
             else
@@ -237,21 +261,6 @@ namespace M6.Form
 
         private void On_TestButton()
         {
-            if (_w != null)
-            {
-                _w.Stop();
-                _w.Dispose();
-                _w = null;
-            }
-            else
-            {
-                _project.Tunes[1].StartTick += 0x200;
-                Invalidate();
-
-                _w = new WaveOut();
-                _w.Init(new M6SampleProvider(_project.Tunes[1], 0));
-                _w.Play();
-            }
         }
     }
 }

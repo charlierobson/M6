@@ -30,7 +30,7 @@
         {
             this.buttonFit = new System.Windows.Forms.Button();
             this.buttonPlay = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.buttonTest = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonFit
@@ -55,22 +55,23 @@
             this.buttonPlay.UseVisualStyleBackColor = true;
             this.buttonPlay.Click += new System.EventHandler(this.buttonPlay_Click);
             // 
-            // button1
+            // buttonTest
             // 
-            this.button1.Location = new System.Drawing.Point(969, 404);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.buttonTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonTest.Location = new System.Drawing.Point(969, 404);
+            this.buttonTest.Name = "buttonTest";
+            this.buttonTest.Size = new System.Drawing.Size(75, 23);
+            this.buttonTest.TabIndex = 2;
+            this.buttonTest.Text = "TEST";
+            this.buttonTest.UseVisualStyleBackColor = true;
+            this.buttonTest.Click += new System.EventHandler(this.button1_Click);
             // 
             // M6Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1056, 497);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.buttonTest);
             this.Controls.Add(this.buttonPlay);
             this.Controls.Add(this.buttonFit);
             this.Name = "M6Form";
@@ -90,7 +91,7 @@
 
         private System.Windows.Forms.Button buttonFit;
         private System.Windows.Forms.Button buttonPlay;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonTest;
     }
 }
 

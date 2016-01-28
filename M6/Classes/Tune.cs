@@ -4,30 +4,48 @@ namespace M6.Classes
 {
     public class Tune : ITune
     {
+        private readonly IMixProperties _mixProperties;
         private readonly IFrameData _frameData;
 
         public SummaryCollection SummaryCollection;
 
         private IFrameData _onsets;
 
+        public double BitRate { get; set; }
+
+        public int LengthInFrames
+        {
+            get { return _frameData.Left.Length; }
+        }
+
+        public int LengthInTicks
+        {
+            get { return (int)(LengthInFrames * (BitRate / _mixProperties.PlaybackRateInSamplesPerSecond)); }
+        }
+
         public int StartTick { get; set; }
 
         public int EndTick
         {
-            get { return StartTick + Ticks; }
+            get { return StartTick + LengthInTicks; }
         }
 
-        public int Ticks
+        public int TickToFrame(int tick)
         {
-            get { return (int)(BitRate / 44100 * _frameData.Length); }
+            tick -= StartTick;
+            return (int)(tick / (BitRate / _mixProperties.PlaybackRateInSamplesPerSecond));
+        }
+
+        public int FrameToTick(int frame)
+        {
+            return (int)(StartTick + (frame * (BitRate / _mixProperties.PlaybackRateInSamplesPerSecond)));
         }
 
         public int Track { get; set; }
 
-        public double BitRate { get; set; }
-
-        public Tune(IFrameData frameData)
+        public Tune(IMixProperties mixProperties, IFrameData frameData)
         {
+            _mixProperties = mixProperties;
             _frameData = frameData;
         }
 
@@ -45,7 +63,7 @@ namespace M6.Classes
         public void BuildOnsets()
         {
             var audioAnalysis = new AudioAnalysis();
-            var onsetData = audioAnalysis.DetectOnsets(_frameData, 44100, 1024);
+            var onsetData = audioAnalysis.DetectOnsets(_frameData, _mixProperties.PlaybackRateInSamplesPerSecond, 1024);
             _onsets = new FrameData(onsetData, null, 1024);
         } 
 
@@ -68,14 +86,19 @@ namespace M6.Classes
             get { return new Range(StartTick, EndTick); }
         }
 
+        public Range TickRangeToFrameRange(int startTick, int tickCount)
+        {
+            return new Range(TickToFrame(startTick), TickToFrame(startTick + tickCount));
+        }
+
         public IFrameData FrameData
         {
             get { return _frameData; }
         }
 
-        public IFrameDataSubset Subset(int startTick, int count)
+        public IFrameDataSubset Subset(int startFrame, int frameCount)
         {
-            return _frameData.GetSubset(startTick, count);
+            return _frameData.GetSubset(startFrame, frameCount);
         }
     }
 }

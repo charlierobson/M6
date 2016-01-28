@@ -15,7 +15,7 @@ namespace M6.Classes
         [ProtoMember(3)]
         public int Resolution { get; private set; }
 
-        public int Length { get { return Left.Length; } }
+        public int Frames { get { return Left.Length; } }
 
         private int _chunkReadIndex;
         private int _chunkReadSize;

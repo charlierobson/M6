@@ -23,7 +23,7 @@ namespace M6Tests
         {
             var frameData = new FrameData(new float[inputSetSize], new float[inputSetSize]);
             var summary = _waveSummaryBuilder.MakeSummaryData(frameData, condensationRatio);
-            Assert.Equal(expectedOutputSetSize, summary.Length);
+            Assert.Equal(expectedOutputSetSize, summary.Frames);
         }
 
         [Fact]

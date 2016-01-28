@@ -81,6 +81,7 @@
     <Compile Include="GivenAFrameDataSubset.cs" />
     <Compile Include="GivenARange.cs" />
     <Compile Include="GivenARawPCMFileConverter.cs" />
+    <Compile Include="GivenATune.cs" />
     <Compile Include="GivenAWaveSummary.cs" />
     <Compile Include="GivenAFrameData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

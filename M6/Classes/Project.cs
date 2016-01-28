@@ -14,7 +14,7 @@ namespace M6.Classes
         public int StartTick { get; set; }
     }
 
-    public class Project
+    public class Project : IMixProperties
     {
         public static Project OpenProject(string projectFolder)
         {
@@ -66,7 +66,7 @@ namespace M6.Classes
                     }
                 }
 
-                var tune = new Tune(waveData);
+                var tune = new Tune(project, waveData);
 
                 SummaryCollection summaryData = null;
                 try
@@ -112,5 +112,7 @@ namespace M6.Classes
 
         public string WorkingFolder { get; set; }
         public List<Tune> Tunes { get; private set; }
+
+        public int PlaybackRateInSamplesPerSecond { get { return 44100; } }
     }
 }

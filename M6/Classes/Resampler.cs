@@ -23,7 +23,7 @@ namespace M6.Classes
         {
             int inputSamplesUsed, samplesGenerated;
 
-            var inputRemainingBytes = _sampleSource.Length - _inputSampleOffset;
+            var inputRemainingBytes = _sampleSource.Frames - _inputSampleOffset;
 
             _resamplingEngine.Process(_sampleSource.Left, _inputSampleOffset, inputRemainingBytes,
                 destSampleArray, offset, count,

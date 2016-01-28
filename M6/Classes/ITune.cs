@@ -2,10 +2,13 @@
 {
     public interface ITune
     {
+        int LengthInTicks { get; }
+        int LengthInFrames { get; }
+
         int StartTick { get; set; }
         int EndTick { get; }
-        int Ticks { get; }
-        int Track { get; }
+
+        Range TickRange { get; }
 
         double BitRate { get; set; }
 
@@ -15,9 +18,11 @@
         void BuildOnsets();
         IFrameData Onsets(int displayScale);
 
-        Range TickRange { get; }
-
         IFrameData FrameData { get; }
-        IFrameDataSubset Subset(int startTick, int count);
+        IFrameDataSubset Subset(int startFrame, int frameCount);
+
+        Range TickRangeToFrameRange(int startTick, int tickCount);
+
+        int Track { get; }
     }
 }

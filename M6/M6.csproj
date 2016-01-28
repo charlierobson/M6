@@ -37,6 +37,7 @@
     <Compile Include="Classes\FileConverterFactory.cs" />
     <Compile Include="Classes\FrameDataSubset.cs" />
     <Compile Include="Classes\IFrameDataSubset.cs" />
+    <Compile Include="Classes\IMixProperties.cs" />
     <Compile Include="Classes\InterleavedSampleData.cs" />
     <Compile Include="Classes\ITune.cs" />
     <Compile Include="Classes\MP3FileConverter.cs" />
