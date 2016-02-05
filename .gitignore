@@ -119,3 +119,5 @@ UpgradeLog*.XML
 _ReSharper.*
 [Pp]ackages
 *.msi
+*.opendb
+*/MetaData/*
