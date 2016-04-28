@@ -15,7 +15,7 @@ namespace M6.Classes
 
         public int LengthInFrames
         {
-            get { return _frameData.Left.Length; }
+            get { return _frameData.Frames; }
         }
 
         public int LengthInTicks

@@ -17,9 +17,9 @@ namespace M6.Classes
 	        _tune = tune;
 
             var sourceOffset = 0;
-	        if (playCursorTick > _tune.StartTick)
+	        if (playCursorTick > _tune.TickRange.Minimum)
 	        {
-	            sourceOffset = playCursorTick - _tune.StartTick;
+	            sourceOffset = playCursorTick - _tune.TickRange.Minimum;
 	        }
 
             _resampler = new Resampler(tune.FrameData, sourceOffset, tune.BitRate / 44100.0);
@@ -31,12 +31,12 @@ namespace M6.Classes
         {
             lock (_lockObject)
             {
-                if (_tune.StartTick <= _playCursorTick)
+                if (_tune.TickRange.Minimum <= _playCursorTick)
                 {
                     return _resampler.ReadSamples(buffer, offset, count);
                 }
 
-                var ticksTillPlayStart = Math.Min(count, _tune.StartTick - _playCursorTick);
+                var ticksTillPlayStart = Math.Min(count, _tune.TickRange.Minimum - _playCursorTick);
                 _playCursorTick += ticksTillPlayStart;
 
                 return ticksTillPlayStart;

@@ -2,12 +2,6 @@
 {
     public interface ITune
     {
-        int LengthInTicks { get; }
-        int LengthInFrames { get; }
-
-        int StartTick { get; set; }
-        int EndTick { get; }
-
         Range TickRange { get; }
 
         double BitRate { get; set; }
